@@ -1,0 +1,41 @@
+{
+  "identifier" : "1735337C-3769-4061-9074-2C3E12E99DA1",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "22.00",
+      "familyShareable" : false,
+      "internalID" : "E8A2458A-B4EC-471E-B5D6-BD840A14C8E4",
+      "localizations" : [
+        {
+          "description" : "一次买断，解锁提分之路全部关卡（阅读 / 应用文 / 读后续写）与提分雷达全模块导航。无订阅、无续费，支持换机恢复购买。",
+          "displayName" : "完整版解锁",
+          "locale" : "zh_CN"
+        }
+      ],
+      "productID" : "com.engapex.app.full_unlock",
+      "referenceName" : "EngApex Full Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "0",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "zh_CN",
+    "_storefront" : "CHN",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

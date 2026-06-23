@@ -1,0 +1,209 @@
+import SwiftUI
+
+/// 限时模考：算法组卷 → 限时作答（不即时揭答案）→ 自动判分折合高考分 + 薄弱报告。
+struct MockExamView: View {
+    @EnvironmentObject var store: EngStore
+    @Environment(\.dismiss) private var dismiss
+
+    private enum Phase { case intro, exam, result }
+    @State private var phase: Phase = .intro
+    @State private var paper: [Question] = []
+    @State private var answers: [String: Int] = [:]
+    @State private var index = 0
+    @State private var elapsed = 0
+    @State private var result: MockResult?
+
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        Group {
+            switch phase {
+            case .intro:  introView
+            case .exam:   examView
+            case .result: resultView
+            }
+        }
+        .background(Color.apexBackground.ignoresSafeArea())
+        .navigationTitle("限时模考")
+        .navigationBarTitleDisplayMode(.inline)
+        .onReceive(timer) { _ in if phase == .exam { elapsed += 1 } }
+    }
+
+    // MARK: Intro
+
+    private var introView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.lg) {
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    Label("算法组卷", systemImage: "doc.text.magnifyingglass")
+                        .font(AppFont.cardTitle).foregroundColor(.apexLava)
+                    Text("自动抽取一套覆盖各题型的卷子，限时作答、交卷后自动判分并折合高考分。")
+                        .font(AppFont.caption).foregroundColor(.secondary)
+                    Text("满分 120 分（暂不含听力 30 分，待音频内容上线）")
+                        .font(AppFont.chip).foregroundColor(.apexGold)
+                }.frame(maxWidth: .infinity, alignment: .leading).cardSurface(padding: Spacing.md)
+
+                let mock = MockManager.shared
+                if mock.count > 0 {
+                    HStack {
+                        stat("上次", mock.lastScore)
+                        Divider().frame(height: 36)
+                        stat("最佳", mock.bestScore)
+                        Divider().frame(height: 36)
+                        VStack(spacing: 2) {
+                            Text("\(mock.count)").font(AppFont.bigStat(22)).foregroundColor(.apexStarBlue)
+                            Text("已考次数").font(AppFont.caption).foregroundColor(.secondary)
+                        }.frame(maxWidth: .infinity)
+                    }.cardSurface(padding: Spacing.md)
+                }
+
+                Button { startExam() } label: {
+                    Text("开始模考").font(AppFont.cardTitle).foregroundColor(.white)
+                        .frame(maxWidth: .infinity).padding(Spacing.md)
+                        .background(Color.apexLava).cornerRadius(Radius.inner)
+                }
+            }
+            .padding(Spacing.lg).readableWidth()
+        }
+    }
+
+    private func stat(_ label: String, _ v: Double) -> some View {
+        VStack(spacing: 2) {
+            Text(fmt(v)).font(AppFont.bigStat(22)).foregroundColor(.apexLava)
+            Text(label).font(AppFont.caption).foregroundColor(.secondary)
+        }.frame(maxWidth: .infinity)
+    }
+
+    // MARK: Exam
+
+    @ViewBuilder private var examView: some View {
+        if index < paper.count {
+            let q = paper[index]
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.lg) {
+                    HStack {
+                        TagChip(text: q.module.title, color: .apexStarBlue)
+                        Spacer()
+                        Label(timeString, systemImage: "clock").font(AppFont.caption).foregroundColor(.secondary)
+                        Text("\(index + 1)/\(paper.count)").font(AppFont.caption).foregroundColor(.secondary)
+                    }
+                    ProgressView(value: Double(index + 1), total: Double(paper.count)).tint(.apexLava)
+                    Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
+                    ForEach(Array(q.options.enumerated()), id: \.offset) { i, opt in
+                        Button { answers[q.id] = i } label: {
+                            HStack {
+                                Text(opt).font(AppFont.body).multilineTextAlignment(.leading)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Spacer()
+                                if answers[q.id] == i {
+                                    Image(systemName: "largecircle.fill.circle").foregroundColor(.apexLava)
+                                }
+                            }
+                            .padding(Spacing.md).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(answers[q.id] == i ? Color.apexLava.opacity(0.12) : Color.apexCardSurface)
+                            .cornerRadius(Radius.inner)
+                        }.buttonStyle(.plain)
+                    }
+                    HStack {
+                        if index > 0 {
+                            Button { index -= 1 } label: { Label("上一题", systemImage: "chevron.left").font(AppFont.body) }
+                        }
+                        Spacer()
+                        Button {
+                            if index + 1 < paper.count { index += 1 } else { submit() }
+                        } label: {
+                            Text(index + 1 < paper.count ? "下一题" : "交卷判分")
+                                .font(AppFont.cardTitle).foregroundColor(.white)
+                                .padding(.horizontal, Spacing.xl).padding(.vertical, Spacing.sm)
+                                .background(Color.apexLava).cornerRadius(Radius.inner)
+                        }
+                    }
+                }
+                .padding(Spacing.lg).readableWidth()
+            }
+        }
+    }
+
+    // MARK: Result
+
+    @ViewBuilder private var resultView: some View {
+        if let r = result {
+            ScrollView {
+                VStack(spacing: Spacing.lg) {
+                    VStack(spacing: 4) {
+                        Text("折合高考分").font(AppFont.caption).foregroundColor(.secondary)
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(fmt(r.scaledScore)).font(AppFont.bigStat(52)).foregroundColor(.apexLava)
+                            Text("/ \(fmt(r.coveredFullScore))").font(AppFont.body).foregroundColor(.secondary)
+                        }
+                        Text("答对 \(r.totalCorrect)/\(r.totalCount) · 用时 \(timeString)")
+                            .font(AppFont.caption).foregroundColor(.secondary)
+                    }.frame(maxWidth: .infinity).cardSurface()
+
+                    VStack(alignment: .leading, spacing: Spacing.md) {
+                        SectionHeader(title: "各模块表现", systemImage: "chart.bar.fill", accent: .apexStarBlue)
+                        ForEach(ExamModule.allCases.filter { (r.perModule[$0]?.total ?? 0) > 0 }) { m in
+                            let e = r.perModule[m]!
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(m.title).font(AppFont.body)
+                                    Spacer()
+                                    Text("\(e.correct)/\(e.total)").font(AppFont.caption).foregroundColor(.secondary)
+                                }
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        Capsule().fill(Color.secondary.opacity(0.15))
+                                        Capsule().fill(Color.apexStarBlue)
+                                            .frame(width: geo.size.width * (e.total > 0 ? Double(e.correct) / Double(e.total) : 0))
+                                    }
+                                }.frame(height: 7)
+                            }
+                        }
+                    }.cardSurface()
+
+                    if let weak = r.weakestModule {
+                        HStack(spacing: Spacing.sm) {
+                            Image(systemName: "scope").foregroundColor(.apexDanger)
+                            Text("薄弱点：**\(weak.title)** —— 去高频狙击与提分雷达重点补。")
+                                .font(AppFont.caption)
+                            Spacer()
+                        }.cardSurface(padding: Spacing.md)
+                    }
+
+                    Text("错题已自动收录，可在错题本与智能复习里再战。")
+                        .font(AppFont.caption).foregroundColor(.secondary)
+
+                    Button { dismiss() } label: {
+                        Text("完成").font(AppFont.cardTitle).foregroundColor(.white)
+                            .frame(maxWidth: .infinity).padding(Spacing.md)
+                            .background(Color.apexLava).cornerRadius(Radius.inner)
+                    }
+                }
+                .padding(Spacing.lg).readableWidth()
+            }
+        }
+    }
+
+    // MARK: 逻辑
+
+    private func startExam() {
+        paper = MockEngine.assemble(count: 14, from: QuestionBank.all)
+        answers = [:]; index = 0; elapsed = 0
+        phase = .exam
+    }
+
+    private func submit() {
+        let r = MockEngine.score(questions: paper, answers: answers)
+        // 回喂各引擎：已作答的题按对错记录（错题自动入错题本/复习库）
+        for q in paper {
+            guard let a = answers[q.id] else { continue }
+            store.record(q, correct: a == q.answer)
+        }
+        MockManager.shared.recordResult(r.scaledScore)
+        result = r
+        phase = .result
+    }
+
+    private var timeString: String { String(format: "%02d:%02d", elapsed / 60, elapsed % 60) }
+    private func fmt(_ v: Double) -> String { v == v.rounded() ? String(Int(v)) : String(format: "%.1f", v) }
+}
