@@ -8,10 +8,11 @@ struct ReviewCard: Codable {
     var due: Date = Date()      // 下次到期
 }
 
-/// 复习项的来源：错题 或 句式卡。id 形如 "q:g1" / "p:p3"。
+/// 复习项的来源：错题 / 句式卡 / 词汇卡。id 形如 "q:g1" / "p:p3" / "v:v_address"。
 enum ReviewRef {
     case question(Question)
     case phrase(PhraseCard)
+    case vocab(VocabWord)
 
     static func resolve(_ id: String) -> ReviewRef? {
         guard let sep = id.firstIndex(of: ":") else { return nil }
@@ -19,6 +20,7 @@ enum ReviewRef {
         switch kind {
         case "q": return QuestionBank.find(key).map(ReviewRef.question)
         case "p": return PhraseBook.all.first { $0.id == key }.map(ReviewRef.phrase)
+        case "v": return VocabData.find(key).map(ReviewRef.vocab)
         default:  return nil
         }
     }

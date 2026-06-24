@@ -1,20 +1,23 @@
 import SwiftUI
 
-/// 读后续写工坊：情境列表 → 情节链脚手架 + 推荐句式 + 高分范文 + 自评清单。
-struct ContinuationWorkshopView: View {
+/// 应用文工坊：体裁列表 → 写作要求 + 结构骨架 + 推荐句式 + 高分范文 + 自评清单。
+struct AppliedWritingWorkshopView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.md) {
-                Text("读后续写 25 分，靠的是‘有套路的想象力’。先用情节链搭骨架，再用高分句式填血肉。")
+                Text("应用文得分靠'踩对结构+用对句式'。先按骨架搭框架，再用推荐句式填血肉。")
                     .font(AppFont.caption).foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                ForEach(ContinuationData.all) { prompt in
-                    NavigationLink { WorkshopDetailView(prompt: prompt) } label: {
+                ForEach(AppliedWritingData.all) { prompt in
+                    NavigationLink { AppliedWritingDetailView(prompt: prompt) } label: {
                         HStack(spacing: Spacing.md) {
-                            Image(systemName: "pencil.and.scribble").font(.title2).foregroundColor(.apexMystery)
+                            Image(systemName: "envelope.fill").font(.title2).foregroundColor(.apexGold)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(prompt.title).font(AppFont.cardTitle)
-                                Text(prompt.context).font(AppFont.caption).foregroundColor(.secondary).lineLimit(2)
+                                HStack(spacing: 6) {
+                                    Text(prompt.genre).font(AppFont.cardTitle)
+                                    TagChip(text: prompt.title, color: .apexStarBlue)
+                                }
+                                Text(prompt.scenario).font(AppFont.caption).foregroundColor(.secondary).lineLimit(2)
                             }
                             Spacer()
                             Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
@@ -26,36 +29,31 @@ struct ContinuationWorkshopView: View {
             .padding(Spacing.lg).readableWidth()
         }
         .background(Color.apexBackground.ignoresSafeArea())
-        .navigationTitle("读后续写工坊")
+        .navigationTitle("应用文工坊")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-struct WorkshopDetailView: View {
-    let prompt: ContinuationPrompt
+struct AppliedWritingDetailView: View {
+    let prompt: AppliedWritingPrompt
     @State private var showEssay = false
     @State private var checked: Set<Int> = []
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.lg) {
-                // 情境 + 给定首句
                 VStack(alignment: .leading, spacing: Spacing.sm) {
-                    SectionHeader(title: "情境", systemImage: "text.book.closed", accent: .apexStarBlue)
-                    Text(prompt.context).font(AppFont.body)
-                    leadBox("第 1 段首句", prompt.para1Lead)
-                    leadBox("第 2 段首句", prompt.para2Lead)
+                    SectionHeader(title: "写作要求", systemImage: "text.book.closed", accent: .apexStarBlue)
+                    Text(prompt.scenario).font(AppFont.body)
                 }.cardSurface()
 
-                // 情节链脚手架
                 VStack(alignment: .leading, spacing: Spacing.md) {
-                    SectionHeader(title: "情节链脚手架", systemImage: "point.topleft.down.to.point.bottomright.curvepath", accent: .apexLava)
+                    SectionHeader(title: "结构骨架", systemImage: "point.topleft.down.to.point.bottomright.curvepath", accent: .apexLava)
                     ForEach(Array(prompt.stages.enumerated()), id: \.element.id) { i, stage in
                         stageRow(index: i + 1, stage: stage)
                     }
                 }.cardSurface()
 
-                // 高分范文（默认折叠，先想后看）
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     Button { withAnimation { showEssay.toggle() } } label: {
                         HStack {
@@ -72,7 +70,6 @@ struct WorkshopDetailView: View {
                     }
                 }.cardSurface()
 
-                // 自评清单（诚信：不做机器打分，自评对照）
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     SectionHeader(title: "自评清单", systemImage: "checklist", accent: .apexGold)
                     ForEach(Array(prompt.rubric.enumerated()), id: \.offset) { i, item in
@@ -90,7 +87,7 @@ struct WorkshopDetailView: View {
                         .foregroundColor(checked.count == prompt.rubric.count ? .apexEmerald : .secondary)
                 }.cardSurface()
 
-                WritingCoachView(requiredLeads: [prompt.para1Lead, prompt.para2Lead])
+                WritingCoachView()
             }
             .padding(Spacing.lg).readableWidth()
         }
@@ -99,16 +96,7 @@ struct WorkshopDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func leadBox(_ label: String, _ text: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label).font(AppFont.chip).foregroundColor(.apexStarBlue)
-            Text(text).font(AppFont.body).italic().fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Spacing.sm).background(Color.apexBackground).cornerRadius(Radius.chip)
-    }
-
-    private func stageRow(index: Int, stage: PlotStage) -> some View {
+    private func stageRow(index: Int, stage: WritingStage) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: Spacing.sm) {
                 Text("\(index)").font(AppFont.chip).foregroundColor(.white)

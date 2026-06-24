@@ -106,9 +106,119 @@ final class ScoreEngineTests: XCTestCase {
         }
     }
 
+    func testWritingCoachFlagsEmptyDraft() {
+        let findings = WritingCoachEngine.diagnose("")
+        XCTAssertEqual(findings.count, 1)
+        XCTAssertEqual(findings.first?.severity, .warning)
+    }
+
+    func testWritingCoachDetectsWeakWordRepetition() {
+        let text = "It was a very good day. The weather was very good and the food was very good too."
+        let findings = WritingCoachEngine.diagnose(text)
+        XCTAssertTrue(findings.contains { $0.message.contains("very") })
+        XCTAssertTrue(findings.contains { $0.message.contains("good") })
+    }
+
+    func testWritingCoachDetectsAdvancedPattern() {
+        let withPattern = "Not only did she finish her homework early, but she also helped her brother with his project tonight after dinner."
+        let hit = WritingCoachEngine.diagnose(withPattern)
+        XCTAssertTrue(hit.contains { $0.severity == .good && $0.message.contains("not only") })
+
+        let withoutPattern = "She finished her homework early. Then she helped her brother with his school project after they had dinner together."
+        let miss = WritingCoachEngine.diagnose(withoutPattern)
+        XCTAssertTrue(miss.contains { $0.severity == .tip && $0.message.contains("加分句式") })
+    }
+
+    func testWritingCoachDetectsMissingLeadSentence() {
+        let lead = "Rain poured down as Tom stumbled along the muddy path."
+        let missing = WritingCoachEngine.diagnose("He walked home in the rain and felt cold and tired after a long day at school.", requiredLeads: [lead])
+        XCTAssertTrue(missing.contains { $0.severity == .warning && $0.message.contains("给定首句") })
+
+        let present = WritingCoachEngine.diagnose(lead + " He kept walking until he saw a light in the distance ahead of him.", requiredLeads: [lead])
+        XCTAssertFalse(present.contains { $0.severity == .warning && $0.message.contains("给定首句") })
+    }
+
+    func testWritingCoachDetectsLowercaseI() {
+        let findings = WritingCoachEngine.diagnose("i went to the park yesterday and i had a great time with my friends there.")
+        XCTAssertTrue(findings.contains { $0.message.contains("小写") })
+    }
+
+    func testVocabDataIntegrity() {
+        let all = VocabData.all
+        XCTAssertEqual(all.count, 55, "词汇专项二期扩充后应有 55 词")
+        XCTAssertEqual(Set(all.map(\.id)).count, all.count, "单词 ID 必须唯一")
+        XCTAssertEqual(Set(all.map(\.headword)).count, all.count, "单词拼写必须唯一")
+        for w in all {
+            XCTAssertTrue(w.quizOptions.indices.contains(w.quizAnswer), "\(w.id) 小测答案下标越界")
+            XCTAssertFalse(w.quizStem.isEmpty)
+            XCTAssertFalse(w.example.isEmpty)
+        }
+        XCTAssertFalse(VocabData.all.filter { $0.category == .collocation }.isEmpty)
+        XCTAssertFalse(VocabData.all.filter { $0.category == .polysemy }.isEmpty)
+    }
+
+    func testVocabFindByHeadwordIsCaseInsensitive() {
+        XCTAssertNotNil(VocabData.find(headword: "Address"))
+        XCTAssertNotNil(VocabData.find(headword: "  bear  "))
+        XCTAssertNil(VocabData.find(headword: "nonexistentword"))
+    }
+
+    func testVocabStoreMasteryAndPriority() {
+        let store = VocabStore.shared
+        store.resetAll()
+        let word = VocabData.all[0]
+        XCTAssertEqual(store.mastery(word), 0.2, accuracy: 0.001, "未做过的词应给低基线掌握度")
+
+        store.recordSpelling(word, correct: true)
+        store.recordSpelling(word, correct: true)
+        store.recordQuiz(word, correct: false)
+        let mastery = store.mastery(word)
+        XCTAssertGreaterThan(mastery, 0.2)
+        XCTAssertLessThan(mastery, 1.0)
+
+        store.toggleMastered(word.id)
+        XCTAssertEqual(store.mastery(word), 1.0, accuracy: 0.001)
+
+        let priority = store.priorityList(VocabData.all)
+        XCTAssertEqual(priority.count, VocabData.all.count)
+        XCTAssertTrue(zip(priority, priority.dropFirst()).allSatisfy { $0.1 >= $1.1 }, "应按狙击优先级降序")
+        store.resetAll()
+    }
+
+    func testReviewRefResolvesVocab() {
+        let id = "v:\(VocabData.all[0].id)"
+        guard case .vocab(let w)? = ReviewRef.resolve(id) else {
+            return XCTFail("应能解析 v: 前缀的词汇复习项")
+        }
+        XCTAssertEqual(w.id, VocabData.all[0].id)
+    }
+
+    func testHardTierLiftsDifficultyDistribution() {
+        let hard = QuestionBank.hardTier
+        XCTAssertEqual(hard.count, 28, "拔高补强批次应有 28 题")
+        for q in hard {
+            XCTAssertGreaterThanOrEqual(q.difficulty, 0.7, "\(q.id) 应归为拔高难度(≥0.7)")
+        }
+        let allHardCount = QuestionBank.all.filter { $0.difficulty >= 0.7 }.count
+        XCTAssertGreaterThanOrEqual(allHardCount, 28, "拔高题总数应随补强批次同步提升")
+    }
+
+    func testPassageDrillIntegrity() {
+        let cloze = QuestionBank.passageDrillCloze
+        let grammar = QuestionBank.passageDrillGrammar
+        XCTAssertEqual(cloze.count, 20, "完形整篇实战应有 20 空")
+        XCTAssertEqual(grammar.count, 10, "语法填空整篇实战应有 10 空")
+        for (i, q) in cloze.enumerated() {
+            XCTAssertTrue(q.stem.contains("___\(i + 1)___"), "完形整篇第 \(i + 1) 空的 stem 应标出当前空格")
+        }
+        for (i, q) in grammar.enumerated() {
+            XCTAssertTrue(q.stem.contains("___\(i + 1)___"), "语法填空整篇第 \(i + 1) 空的 stem 应标出当前空格")
+        }
+    }
+
     func testListeningQuestionsHaveScript() {
         let listening = QuestionBank.all.filter { $0.module == .listening }
-        XCTAssertEqual(listening.count, 30)
+        XCTAssertEqual(listening.count, 33)
         for q in listening {
             XCTAssertNotNil(q.listeningScript, "听力题 \(q.id) 缺听力原文")
             XCTAssertFalse(q.listeningScript?.isEmpty ?? true, "听力题 \(q.id) 听力原文为空")
@@ -157,7 +267,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testPhraseBookIntegrity() {
         let all = PhraseBook.all
-        XCTAssertEqual(all.count, 30)
+        XCTAssertEqual(all.count, 36)
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "句式卡 ID 必须唯一")
         for cat in PhraseCategory.allCases {
             XCTAssertFalse(PhraseBook.cards(in: cat).isEmpty, "类目 \(cat.title) 不应为空")
@@ -167,7 +277,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testContinuationWorkshopIntegrity() {
         let all = ContinuationData.all
-        XCTAssertFalse(all.isEmpty)
+        XCTAssertEqual(all.count, 12, "求助/坚持/和解/动物/诚信/亲情六类主题各 2 个场景，加深迁移性")
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "情境 ID 必须唯一")
         for p in all {
             XCTAssertFalse(p.stages.isEmpty, "\(p.id) 缺情节链")
@@ -175,6 +285,22 @@ final class ScoreEngineTests: XCTestCase {
             XCTAssertFalse(p.modelEssay.isEmpty)
             for stage in p.stages {
                 // 关联句式必须真实存在
+                for pid in stage.phraseIds {
+                    XCTAssertNotNil(PhraseBook.all.first { $0.id == pid }, "\(p.id)/\(stage.name) 关联了不存在的句式 \(pid)")
+                }
+            }
+        }
+    }
+
+    func testAppliedWritingWorkshopIntegrity() {
+        let all = AppliedWritingData.all
+        XCTAssertEqual(all.count, 12, "六个体裁各 2 个场景，加深迁移性")
+        XCTAssertEqual(Set(all.map(\.id)).count, all.count, "情境 ID 必须唯一")
+        for p in all {
+            XCTAssertFalse(p.stages.isEmpty, "\(p.id) 缺结构骨架")
+            XCTAssertFalse(p.rubric.isEmpty, "\(p.id) 缺自评清单")
+            XCTAssertFalse(p.modelEssay.isEmpty)
+            for stage in p.stages {
                 for pid in stage.phraseIds {
                     XCTAssertNotNil(PhraseBook.all.first { $0.id == pid }, "\(p.id)/\(stage.name) 关联了不存在的句式 \(pid)")
                 }
@@ -277,6 +403,17 @@ final class ScoreEngineTests: XCTestCase {
         XCTAssertEqual(r.scaledScore, r.coveredFullScore, accuracy: 0.01, "全对应折合覆盖模块满分")
         XCTAssertTrue(r.includesListening, "听力题库已上线，组卷应自动覆盖听力")
         XCTAssertEqual(r.coveredFullScore, 150, accuracy: 0.01, "七模块满分合计 150（含听力 30）")
+    }
+
+    func testMockAssembleDistributesProportionallyAtScale() {
+        let paper = MockEngine.assemble(count: 50, from: QuestionBank.all)
+        XCTAssertEqual(paper.count, 50)
+        let counts = Dictionary(grouping: paper, by: \.module).mapValues(\.count)
+        for m in ExamModule.allCases {
+            XCTAssertGreaterThanOrEqual(counts[m] ?? 0, 1, "\(m.title) 应至少有 1 题")
+        }
+        let readingShare = Double(counts[.reading] ?? 0) / Double(paper.count)
+        XCTAssertLessThan(readingShare, 0.45, "阅读权重最高(25%)，但大卷不应被单一模块吃满，应远低于满卷比例")
     }
 
     func testMockScoreZeroAndWeakest() {

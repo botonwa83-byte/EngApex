@@ -11,10 +11,24 @@ struct MockExamView: View {
     @State private var answers: [String: Int] = [:]
     @State private var index = 0
     @State private var elapsed = 0
+    @State private var timeLimit = 0
     @State private var result: MockResult?
     @State private var listeningPlayCount = 0
+    @State private var timedOut = false
+    @State private var mockLength: MockLength = .quick
+
+    /// 快速模考用于碎片时间的题型抽样；完整模考更接近真实考场的题量与心理负荷。
+    enum MockLength: String, CaseIterable, Identifiable {
+        case quick, full
+        var id: String { rawValue }
+        var label: String { self == .quick ? "快速模考 · 14 题" : "完整模考 · 50 题" }
+        var count: Int { self == .quick ? 14 : 50 }
+    }
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    /// 剩余秒数：到 0 自动交卷，让"限时"真正限时，逼真训练考场的时间分配。
+    private var remaining: Int { max(0, timeLimit - elapsed) }
 
     var body: some View {
         Group {
@@ -27,8 +41,32 @@ struct MockExamView: View {
         .background(Color.apexBackground.ignoresSafeArea())
         .navigationTitle("限时模考")
         .navigationBarTitleDisplayMode(.inline)
-        .onReceive(timer) { _ in if phase == .exam { elapsed += 1 } }
+        .onReceive(timer) { _ in
+            guard phase == .exam else { return }
+            elapsed += 1
+            if remaining <= 0 { timedOut = true; submit() }
+        }
         .onChange(of: index) { _ in listeningPlayCount = 0; autoPlayIfNeeded() }
+    }
+
+    /// 按模块给每题分配一个接近真实考场节奏的时间预算（含听音频/审题时间）。
+    private static func secondsBudget(for module: ExamModule) -> Int {
+        switch module {
+        case .listening:      return 75
+        case .reading:        return 95
+        case .sevenChoose:    return 70
+        case .cloze:          return 55
+        case .grammarFill:    return 50
+        case .appliedWriting: return 45
+        case .continuation:   return 45
+        }
+    }
+    private static func timeLimit(for paper: [Question]) -> Int {
+        paper.reduce(0) { $0 + secondsBudget(for: $1.module) }
+    }
+
+    private var estimatedMinutes: Int {
+        Self.timeLimit(for: MockEngine.assemble(count: mockLength.count, from: QuestionBank.all)) / 60
     }
 
     /// 听力题首次出现时自动播放一次。
@@ -46,11 +84,20 @@ struct MockExamView: View {
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     Label("算法组卷", systemImage: "doc.text.magnifyingglass")
                         .font(AppFont.cardTitle).foregroundColor(.apexLava)
-                    Text("自动抽取一套覆盖各题型的卷子，限时作答、交卷后自动判分并折合高考分。")
+                    Text("自动抽取一套覆盖各题型的卷子，限时作答、时间到自动交卷并折合高考分。")
                         .font(AppFont.caption).foregroundColor(.secondary)
                     Text("满分 150 分（含听力，音频为离线语音合成朗读）")
                         .font(AppFont.chip).foregroundColor(.apexGold)
                 }.frame(maxWidth: .infinity, alignment: .leading).cardSurface(padding: Spacing.md)
+
+                VStack(alignment: .leading, spacing: Spacing.sm) {
+                    Picker("模考长度", selection: $mockLength) {
+                        ForEach(MockLength.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    Text("本卷按题型节奏配速，约 \(estimatedMinutes) 分钟，到点强制交卷")
+                        .font(AppFont.chip).foregroundColor(.secondary)
+                }.cardSurface(padding: Spacing.md)
 
                 let mock = MockManager.shared
                 if mock.count > 0 {
@@ -93,7 +140,8 @@ struct MockExamView: View {
                     HStack {
                         TagChip(text: q.module.title, color: .apexStarBlue)
                         Spacer()
-                        Label(timeString, systemImage: "clock").font(AppFont.caption).foregroundColor(.secondary)
+                        Label(remainingString, systemImage: "clock")
+                            .font(AppFont.caption).foregroundColor(remaining <= 60 ? .apexDanger : .secondary)
                         Text("\(index + 1)/\(paper.count)").font(AppFont.caption).foregroundColor(.secondary)
                     }
                     ProgressView(value: Double(index + 1), total: Double(paper.count)).tint(.apexLava)
@@ -150,6 +198,9 @@ struct MockExamView: View {
                         }
                         Text("答对 \(r.totalCorrect)/\(r.totalCount) · 用时 \(timeString)")
                             .font(AppFont.caption).foregroundColor(.secondary)
+                        if timedOut {
+                            Text("时间到，已自动交卷").font(AppFont.chip).foregroundColor(.apexDanger)
+                        }
                     }.frame(maxWidth: .infinity).cardSurface()
 
                     VStack(alignment: .leading, spacing: Spacing.md) {
@@ -199,8 +250,9 @@ struct MockExamView: View {
     // MARK: 逻辑
 
     private func startExam() {
-        paper = MockEngine.assemble(count: 14, from: QuestionBank.all)
-        answers = [:]; index = 0; elapsed = 0; listeningPlayCount = 0
+        paper = MockEngine.assemble(count: mockLength.count, from: QuestionBank.all)
+        answers = [:]; index = 0; elapsed = 0; listeningPlayCount = 0; timedOut = false
+        timeLimit = Self.timeLimit(for: paper)
         phase = .exam
         autoPlayIfNeeded()
     }
@@ -218,5 +270,6 @@ struct MockExamView: View {
     }
 
     private var timeString: String { String(format: "%02d:%02d", elapsed / 60, elapsed % 60) }
+    private var remainingString: String { String(format: "%02d:%02d", remaining / 60, remaining % 60) }
     private func fmt(_ v: Double) -> String { v == v.rounded() ? String(Int(v)) : String(format: "%.1f", v) }
 }

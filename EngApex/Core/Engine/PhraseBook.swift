@@ -60,8 +60,8 @@ enum PhraseBook {
             usage: "书信结尾固定礼貌句，规范得体。"),
     ]
 
-    /// 二期扩充（12 → 30 张，新增熟词僻义档案）。
-    static let extended: [PhraseCard] = extendedA + extendedB
+    /// 二期扩充（12 → 30 张，新增熟词僻义档案）；三期补充应用文分体裁开头句（30 → 36 张）。
+    static let extended: [PhraseCard] = extendedA + extendedB + extendedC
 
     static let extendedA: [PhraseCard] = [
         // 续写开头/画面
@@ -144,6 +144,34 @@ enum PhraseBook {
             en: "second　常义：第二；秒",
             zh: "僻义：赞同、支持",
             usage: "I second your proposal. 我赞同你的提议。"),
+    ]
+
+    static let extendedC: [PhraseCard] = [
+        // 应用文·分体裁开头句
+        PhraseCard(id: "p23", category: .applied,
+            en: "I'm writing to ask for your advice on how to prepare for the speech contest.",
+            zh: "我写信是想就如何准备演讲比赛向你请教。",
+            usage: "求助信标准开头，先点明求助内容再展开细节。"),
+        PhraseCard(id: "p24", category: .applied,
+            en: "I'm writing to offer a few suggestions on improving our school's recycling program.",
+            zh: "我写信是想就改进学校的回收计划提几点建议。",
+            usage: "建议信开头，直接点出建议主题，方便阅卷者快速定位文体。"),
+        PhraseCard(id: "p25", category: .applied,
+            en: "I'm writing to express my heartfelt thanks for your generous help last weekend.",
+            zh: "我写信是想为你上周末的热心帮助表达由衷感谢。",
+            usage: "感谢信开头，heartfelt 比 thank you very much 更书面、更有诚意。"),
+        PhraseCard(id: "p26", category: .applied,
+            en: "I'm writing to sincerely apologize for missing our appointment yesterday.",
+            zh: "我写信是想为昨天错过我们的约定真诚致歉。",
+            usage: "道歉信开头，sincerely apologize 比单纯的 sorry 更正式得体。"),
+        PhraseCard(id: "p27", category: .applied,
+            en: "This is to inform all students that the English speech contest will be held this Friday.",
+            zh: "现通知全体学生，英语演讲比赛将于本周五举行。",
+            usage: "通知类标准开头，This is to inform... 直接点出通知对象与事项。"),
+        PhraseCard(id: "p28", category: .applied,
+            en: "Those interested are welcome to sign up by emailing the Students' Union before Friday.",
+            zh: "有意者可在周五前邮件联系学生会报名。",
+            usage: "通知/海报类报名方式的标准表达，信息要素(方式+截止时间)一句给全。"),
     ]
 
     static func cards(in category: PhraseCategory) -> [PhraseCard] {

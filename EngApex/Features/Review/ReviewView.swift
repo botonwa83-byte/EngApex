@@ -61,6 +61,9 @@ struct ReviewView: View {
             Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
         case .phrase(let p):
             Text(p.en).font(.title3.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
+        case .vocab(let w):
+            Text(w.meaning).font(.title3.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
+            Text("根据释义回忆这个词怎么拼、怎么用。").font(AppFont.caption).foregroundColor(.secondary)
         }
     }
 
@@ -79,6 +82,16 @@ struct ReviewView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(p.zh).font(.body)
                 Text(p.usage).font(AppFont.caption).foregroundColor(.secondary)
+            }
+        case .vocab(let w):
+            VStack(alignment: .leading, spacing: 6) {
+                Label(w.headword, systemImage: "checkmark.circle.fill")
+                    .foregroundColor(.apexEmerald).font(AppFont.cardTitle)
+                Text(w.example).font(.body).italic().fixedSize(horizontal: false, vertical: true)
+                Text(w.exampleMeaning).font(AppFont.caption).foregroundColor(.secondary)
+                if !w.collocations.isEmpty {
+                    Text(w.collocations.joined(separator: " · ")).font(AppFont.chip).foregroundColor(.apexGold)
+                }
             }
         }
     }
@@ -110,6 +123,6 @@ struct ReviewView: View {
     }
 
     private func kindLabel(_ ref: ReviewRef) -> String {
-        switch ref { case .question: return "错题复习"; case .phrase: return "句式复习" }
+        switch ref { case .question: return "错题复习"; case .phrase: return "句式复习"; case .vocab: return "词汇复习" }
     }
 }

@@ -16,7 +16,11 @@ enum QuestionBank {
         result += extended3
         result += extended4
         result += extended5
+        result += extended6
         result += listening
+        result += passageDrillCloze
+        result += passageDrillGrammar
+        result += hardTier
         return result
     }()
 

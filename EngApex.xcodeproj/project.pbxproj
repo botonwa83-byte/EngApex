@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF4C44AA713E4F96A9FFD137 /* QuestionBank+Extended6.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */; };
+		2ABE79A4CA6F485B9D6FFFB0 /* WritingCoachEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF75510694634436968FE13D /* WritingCoachEngine.swift */; };
+		79E4E31DD1AB4BCD95CE5A21 /* WritingCoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882E56190EF4539A3F96C35 /* WritingCoachView.swift */; };
+		470EDA08D8894AA9BC2864CF /* VocabWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA01CC9A0ECA43108C6AF007 /* VocabWord.swift */; };
+		0B5B4C213C834EA7AF2589E3 /* VocabData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20691C2976D94045B09C79C3 /* VocabData.swift */; };
+		36D246038FC64F0482D68C6D /* VocabStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B0D5B8F03B40C08C72CC32 /* VocabStore.swift */; };
+		79CA5C4A4C2742BBBA60CCA4 /* VocabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2246C9AF425193A9FCD9 /* VocabView.swift */; };
+		0495414ED9664045BE4D9BC0 /* QuestionBank+HardTier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4609E1A4645040CB8BAFD20F /* QuestionBank+HardTier.swift */; };
+		DC431EFCAC15459C8A0451F4 /* QuestionBank+PassageDrill.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00D4B6307CA40388253006E /* QuestionBank+PassageDrill.swift */; };
+		12160BD32EA943C4A2E82FEB /* AppliedWritingPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93FBF84DF454294B864759D /* AppliedWritingPrompt.swift */; };
+		519D7F5636C74AA8AA70B526 /* AppliedWritingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 587E1854BB0545B491D07A68 /* AppliedWritingData.swift */; };
+		2CF25F025CF54ACE8221C3FC /* AppliedWritingWorkshopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3123B4A1532442388087CDD /* AppliedWritingWorkshopView.swift */; };
 		005E1CE46ABA58A62EBAB569 /* ReviewScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2AAFA62C203F135CD3F52C5 /* ReviewScheduler.swift */; };
 		07F19878DD30C1401872DB58 /* SpeechPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7ADAC4910E89DB7007996D4 /* SpeechPlayer.swift */; };
 		221F1F7BD073593E16A66755 /* HighFreqView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0BDD565C56E69AC0D38F77E /* HighFreqView.swift */; };
@@ -61,6 +73,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended6.swift"; sourceTree = "<group>"; };
+		EF75510694634436968FE13D /* WritingCoachEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingCoachEngine.swift; sourceTree = "<group>"; };
+		5882E56190EF4539A3F96C35 /* WritingCoachView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingCoachView.swift; sourceTree = "<group>"; };
+		FA01CC9A0ECA43108C6AF007 /* VocabWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWord.swift; sourceTree = "<group>"; };
+		20691C2976D94045B09C79C3 /* VocabData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabData.swift; sourceTree = "<group>"; };
+		72B0D5B8F03B40C08C72CC32 /* VocabStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabStore.swift; sourceTree = "<group>"; };
+		B61E2246C9AF425193A9FCD9 /* VocabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabView.swift; sourceTree = "<group>"; };
+		4609E1A4645040CB8BAFD20F /* QuestionBank+HardTier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+HardTier.swift"; sourceTree = "<group>"; };
+		D00D4B6307CA40388253006E /* QuestionBank+PassageDrill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+PassageDrill.swift"; sourceTree = "<group>"; };
+		C93FBF84DF454294B864759D /* AppliedWritingPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppliedWritingPrompt.swift; sourceTree = "<group>"; };
+		587E1854BB0545B491D07A68 /* AppliedWritingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppliedWritingData.swift; sourceTree = "<group>"; };
+		D3123B4A1532442388087CDD /* AppliedWritingWorkshopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppliedWritingWorkshopView.swift; sourceTree = "<group>"; };
 		0E7EE1F33F537074F2D68465 /* ContinuationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuationData.swift; sourceTree = "<group>"; };
 		129D71F4CB8E5A15131539BB /* ThemeColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColors.swift; sourceTree = "<group>"; };
 		13BC2DE0A43C9C04168ED000 /* ListeningPlayerCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningPlayerCard.swift; sourceTree = "<group>"; };
@@ -69,7 +93,7 @@
 		21892ADC0099F248948CF241 /* QuestionBank+Extended4.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended4.swift"; sourceTree = "<group>"; };
 		22FE06263C8B7A1DC74B21E3 /* EngApexApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngApexApp.swift; sourceTree = "<group>"; };
 		312EB11201C587FC5DB35EFC /* MockEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEngine.swift; sourceTree = "<group>"; };
-		323A462D1E87341EDD793B71 /* EngApex.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EngApex.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		323A462D1E87341EDD793B71 /* EngApex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EngApex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3576AFD3BDFB870BA1A007E3 /* GainRadar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GainRadar.swift; sourceTree = "<group>"; };
 		375E030F934AE26D15EDC062 /* QuestionBank+Extended.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended.swift"; sourceTree = "<group>"; };
 		4323E0D548A0F484C7952AA9 /* ContinuationPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuationPrompt.swift; sourceTree = "<group>"; };
@@ -126,7 +150,9 @@
 		25C378E500BD61C805C5B119 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C93FBF84DF454294B864759D /* AppliedWritingPrompt.swift */,
 				4323E0D548A0F484C7952AA9 /* ContinuationPrompt.swift */,
+				FA01CC9A0ECA43108C6AF007 /* VocabWord.swift */,
 				92C5F5CB5DD9528EB89EA484 /* EngContent.swift */,
 				B762DE029ED94D3EA8FF23B5 /* HighFreqPoint.swift */,
 			);
@@ -139,6 +165,22 @@
 				F1CD2B13AA90F4FA8BBF3C89 /* ContinuationWorkshopView.swift */,
 			);
 			path = Continuation;
+			sourceTree = "<group>";
+		};
+		4874E84E5CC64D17881E71C9 /* AppliedWriting */ = {
+			isa = PBXGroup;
+			children = (
+				D3123B4A1532442388087CDD /* AppliedWritingWorkshopView.swift */,
+			);
+			path = AppliedWriting;
+			sourceTree = "<group>";
+		};
+		B263D4EEE7494D6698E226FC /* Vocab */ = {
+			isa = PBXGroup;
+			children = (
+				B61E2246C9AF425193A9FCD9 /* VocabView.swift */,
+			);
+			path = Vocab;
 			sourceTree = "<group>";
 		};
 		2A948889AF87A5B3EC33DDDA /* EngApexTests */ = {
@@ -160,6 +202,7 @@
 		50D4295F7A769560A23204E8 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				4874E84E5CC64D17881E71C9 /* AppliedWriting */,
 				77DC186B1E33B51791A173FB /* Atlas */,
 				289648982CD5826185CD609B /* Continuation */,
 				711C383528EB84621FD9A79D /* Dashboard */,
@@ -170,6 +213,7 @@
 				175BE02835F718CE83D73B45 /* Paywall */,
 				3F1FA3794D0EC5F37E8E4672 /* Review */,
 				BFCB9213271F12A7D563F551 /* Targets */,
+				B263D4EEE7494D6698E226FC /* Vocab */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -239,6 +283,7 @@
 				1FDDAA62F419C7CA5CE0234C /* DesignSystem.swift */,
 				13BC2DE0A43C9C04168ED000 /* ListeningPlayerCard.swift */,
 				129D71F4CB8E5A15131539BB /* ThemeColors.swift */,
+				5882E56190EF4539A3F96C35 /* WritingCoachView.swift */,
 			);
 			path = Renderer;
 			sourceTree = "<group>";
@@ -283,6 +328,7 @@
 		DCA4EF11B55221140723FD35 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				587E1854BB0545B491D07A68 /* AppliedWritingData.swift */,
 				0E7EE1F33F537074F2D68465 /* ContinuationData.swift */,
 				B0B20BE42702BD2EDBB31C33 /* DailyManager.swift */,
 				CA491D94E7567CD8F8EFC8E2 /* EngStore.swift */,
@@ -296,9 +342,14 @@
 				E5813CFA737E1AB88045CA80 /* QuestionBank+Extended3.swift */,
 				21892ADC0099F248948CF241 /* QuestionBank+Extended4.swift */,
 				744082FE09181D25DE6CB42C /* QuestionBank+Extended5.swift */,
+				DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */,
+				4609E1A4645040CB8BAFD20F /* QuestionBank+HardTier.swift */,
 				C6C9ADA24A20662B81F9CA35 /* QuestionBank+Listening.swift */,
+				D00D4B6307CA40388253006E /* QuestionBank+PassageDrill.swift */,
 				A2AAFA62C203F135CD3F52C5 /* ReviewScheduler.swift */,
 				F7ADAC4910E89DB7007996D4 /* SpeechPlayer.swift */,
+				20691C2976D94045B09C79C3 /* VocabData.swift */,
+				72B0D5B8F03B40C08C72CC32 /* VocabStore.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -312,6 +363,7 @@
 				3576AFD3BDFB870BA1A007E3 /* GainRadar.swift */,
 				E0964B162DD64A652C114B2F /* HighFreqEngine.swift */,
 				312EB11201C587FC5DB35EFC /* MockEngine.swift */,
+				EF75510694634436968FE13D /* WritingCoachEngine.swift */,
 			);
 			path = ScoreEngine;
 			sourceTree = "<group>";
@@ -371,8 +423,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 6FD2279BE603CF68BF271CC0 /* Build configuration list for PBXProject "EngApex" */;
 			developmentRegion = en;
@@ -419,6 +469,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1101EB36A5EC59EEC562996 /* AtlasView.swift in Sources */,
+				12160BD32EA943C4A2E82FEB /* AppliedWritingPrompt.swift in Sources */,
+				519D7F5636C74AA8AA70B526 /* AppliedWritingData.swift in Sources */,
+				2CF25F025CF54ACE8221C3FC /* AppliedWritingWorkshopView.swift in Sources */,
 				BCF0FD758E2B5DBEC2417253 /* ContinuationData.swift in Sources */,
 				72771F67FF29BD0B728DAC15 /* ContinuationPrompt.swift in Sources */,
 				54A98C3172066C02D45B579D /* ContinuationWorkshopView.swift in Sources */,
@@ -448,9 +501,18 @@
 				CED5C97E9C6740957C7B87AB /* QuestionBank+Extended.swift in Sources */,
 				50D8026F6E843C40042E2CA0 /* QuestionBank+Extended2.swift in Sources */,
 				7D88E8208FB38A0AB6921B1D /* QuestionBank+Extended3.swift in Sources */,
+				CF4C44AA713E4F96A9FFD137 /* QuestionBank+Extended6.swift in Sources */,
 				D800A9FE82D21FC1CF1BF2B2 /* QuestionBank+Extended4.swift in Sources */,
 				AE9922A19D0552F04B167132 /* QuestionBank+Extended5.swift in Sources */,
 				30C699A2EEBDF9D5F80CAB66 /* QuestionBank+Listening.swift in Sources */,
+				0495414ED9664045BE4D9BC0 /* QuestionBank+HardTier.swift in Sources */,
+				DC431EFCAC15459C8A0451F4 /* QuestionBank+PassageDrill.swift in Sources */,
+				2ABE79A4CA6F485B9D6FFFB0 /* WritingCoachEngine.swift in Sources */,
+				79E4E31DD1AB4BCD95CE5A21 /* WritingCoachView.swift in Sources */,
+				470EDA08D8894AA9BC2864CF /* VocabWord.swift in Sources */,
+				0B5B4C213C834EA7AF2589E3 /* VocabData.swift in Sources */,
+				36D246038FC64F0482D68C6D /* VocabStore.swift in Sources */,
+				79CA5C4A4C2742BBBA60CCA4 /* VocabView.swift in Sources */,
 				CDE616CCECE84C08E5F27671 /* QuestionBank.swift in Sources */,
 				005E1CE46ABA58A62EBAB569 /* ReviewScheduler.swift in Sources */,
 				50EC4702EED63892E7AB7182 /* ReviewView.swift in Sources */,
@@ -560,6 +622,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z7F8BY55DS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = EngApex;
@@ -661,6 +724,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = Z7F8BY55DS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = EngApex;

@@ -62,7 +62,7 @@ struct AtlasView: View {
                                 Text(card.usage).font(AppFont.chip).foregroundColor(cat.color)
                             }
                             Spacer(minLength: 0)
-                            PhraseReviewButton(id: "p:\(card.id)")
+                            ReviewToggleButton(id: "p:\(card.id)")
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(Spacing.sm)
@@ -75,8 +75,8 @@ struct AtlasView: View {
     }
 }
 
-/// 句式卡"加入复习"按钮：加入 SM-2 复习库后变为已加入态。
-private struct PhraseReviewButton: View {
+/// "加入复习"按钮：加入 SM-2 复习库后变为已加入态。句式卡/词汇卡通用，按各自的 id 前缀区分。
+struct ReviewToggleButton: View {
     let id: String
     @ObservedObject private var scheduler = ReviewScheduler.shared
     var body: some View {

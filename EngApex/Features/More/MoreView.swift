@@ -16,7 +16,7 @@ struct MoreView: View {
                                 Image(systemName: "crown.fill").font(.title3).foregroundColor(.apexGold)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("解锁完整版").font(.headline).foregroundColor(.primary)
-                                    Text("主线 6 关全开（阅读/应用文/读后续写），一次买断")
+                                    Text("主线 7 关全开（阅读/应用文/读后续写/听力），一次买断")
                                         .font(.caption).foregroundColor(.secondary)
                                 }
                                 Spacer()
@@ -64,6 +64,12 @@ struct MoreView: View {
                 Section("专项突破") {
                     NavigationLink { ContinuationWorkshopView() } label: {
                         Label("读后续写工坊", systemImage: "pencil.and.scribble")
+                    }
+                    NavigationLink { AppliedWritingWorkshopView() } label: {
+                        Label("应用文工坊", systemImage: "envelope.fill")
+                    }
+                    NavigationLink { VocabView() } label: {
+                        Label("词汇专项", systemImage: "character.book.closed")
                     }
                 }
 

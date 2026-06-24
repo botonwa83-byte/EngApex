@@ -45,6 +45,9 @@ struct MainTabView: View {
     @State private var demoMock = ProcessInfo.processInfo.arguments.contains("-demoMock")
     @State private var demoAtlas = ProcessInfo.processInfo.arguments.contains("-demoAtlas")
     @State private var demoWorkshop = ProcessInfo.processInfo.arguments.contains("-demoWorkshop")
+    @State private var demoListening = ProcessInfo.processInfo.arguments.contains("-demoListening")
+    @State private var demoApplied = ProcessInfo.processInfo.arguments.contains("-demoApplied")
+    @State private var demoVocab = ProcessInfo.processInfo.arguments.contains("-demoVocab")
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -79,6 +82,17 @@ struct MainTabView: View {
         }
         .fullScreenCover(isPresented: $demoWorkshop) {
             NavigationStack { ContinuationWorkshopView() }
+        }
+        .fullScreenCover(isPresented: $demoListening) {
+            if let level = MainLineData.level(for: .listening) {
+                NavigationStack { QuizView(level: level) }
+            }
+        }
+        .fullScreenCover(isPresented: $demoApplied) {
+            NavigationStack { AppliedWritingWorkshopView() }
+        }
+        .fullScreenCover(isPresented: $demoVocab) {
+            NavigationStack { VocabView() }
         }
     }
 }

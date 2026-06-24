@@ -101,9 +101,13 @@ struct QuizView: View {
     @State private var revealed = false
     @State private var showDiagnose = false
     @State private var listeningPlayCount = 0
+    @State private var fillMode = true
+    @State private var typedAnswer = ""
 
     private var questions: [Question] { QuestionBank.byLevel(level.id) }
     private var q: Question? { index < questions.count ? questions[index] : nil }
+    /// 语法填空在真实考场是"给词根写词形"，不是 4 选 1——默认练写词，选择题模式作兜底提示。
+    private var usesFillMode: Bool { level.module == .grammarFill && fillMode }
 
     var body: some View {
         ScrollView {
@@ -111,12 +115,18 @@ struct QuizView: View {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
                     header
                     modelNote
+                    if level.module == .grammarFill { modePicker }
                     if let script = q.listeningScript {
                         ListeningPlayerCard(script: script, playCount: $listeningPlayCount)
                     }
                     Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
-                    ForEach(Array(q.options.enumerated()), id: \.offset) { i, opt in
-                        optionRow(q, i: i, text: opt)
+                    if usesFillMode && !revealed {
+                        fillInput(q)
+                    } else {
+                        if usesFillMode { typedAnswerSummary(q) }
+                        ForEach(Array(q.options.enumerated()), id: \.offset) { i, opt in
+                            optionRow(q, i: i, text: opt)
+                        }
                     }
                     if revealed { explanation(q) }
                 }
@@ -150,6 +160,53 @@ struct QuizView: View {
             Spacer()
             if !questions.isEmpty { Text("\(min(index + 1, questions.count))/\(questions.count)").font(AppFont.caption).foregroundColor(.secondary) }
         }
+    }
+
+    private var modePicker: some View {
+        Picker("练习模式", selection: $fillMode) {
+            Text("写词模式·仿考场").tag(true)
+            Text("选择题模式").tag(false)
+        }
+        .pickerStyle(.segmented)
+        .disabled(revealed)
+    }
+
+    private func fillInput(_ q: Question) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            TextField("填入空格处应填的词/词组", text: $typedAnswer)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .onSubmit { submitFill(q) }
+            Button { submitFill(q) } label: {
+                Text("提交答案").font(AppFont.cardTitle).foregroundColor(.white)
+                    .frame(maxWidth: .infinity).padding(Spacing.md)
+                    .background(typedAnswer.trimmingCharacters(in: .whitespaces).isEmpty ? Color.secondary : Color.apexStarBlue)
+                    .cornerRadius(Radius.inner)
+            }
+            .disabled(typedAnswer.trimmingCharacters(in: .whitespaces).isEmpty)
+        }
+    }
+
+    private func typedAnswerSummary(_ q: Question) -> some View {
+        let correct = selected == q.answer
+        return HStack(spacing: 6) {
+            Image(systemName: correct ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .foregroundColor(correct ? .apexEmerald : .apexDanger)
+            Text("你填的是：\(typedAnswer.isEmpty ? "（空）" : typedAnswer)")
+                .font(AppFont.body).foregroundColor(.secondary)
+        }
+    }
+
+    private func submitFill(_ q: Question) {
+        guard !revealed else { return }
+        let correct = Self.normalize(typedAnswer) == Self.normalize(q.options[q.answer])
+        selected = correct ? q.answer : -1
+        reveal(q)
+    }
+
+    private static func normalize(_ s: String) -> String {
+        s.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     private var modelNote: some View {
@@ -246,7 +303,7 @@ struct QuizView: View {
     }
 
     private func advance() {
-        revealed = false; selected = nil; listeningPlayCount = 0
+        revealed = false; selected = nil; listeningPlayCount = 0; typedAnswer = ""
         index += 1
         if index >= questions.count { store.markLevelComplete(level.id) }
     }
@@ -263,12 +320,17 @@ struct DiagnoseSheet: View {
     @State private var grammar = true
     @State private var strategy = true
     @State private var rushed = false
+    @State private var unknownWord = ""
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("快速自评（帮算法定位你为什么丢分）") {
                     Toggle("题干关键词我都认识", isOn: $vocab)
+                    if !vocab {
+                        TextField("具体是哪个词？(选填，会加入词汇复习)", text: $unknownWord)
+                            .autocorrectionDisabled().textInputAutocapitalization(.never)
+                    }
                     Toggle("涉及的语法点我懂", isOn: $grammar)
                     Toggle("这类题的解法套路我清楚", isOn: $strategy)
                     Toggle("我是赶时间/没看清", isOn: $rushed)
@@ -285,6 +347,9 @@ struct DiagnoseSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("记录") {
                         store.record(question, correct: false, signal: signal)
+                        if !vocab, let word = VocabData.find(headword: unknownWord) {
+                            ReviewScheduler.shared.addIfAbsent("v:\(word.id)")
+                        }
                         dismiss(); onDone()
                     }
                 }

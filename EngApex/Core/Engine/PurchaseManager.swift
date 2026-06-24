@@ -6,7 +6,7 @@ import SwiftUI
 // 产品 ID：com.engapex.app.full_unlock（¥22 一次性买断，价格在 App Store Connect 配置）
 // 免费档：主线前 3 关（语法填空 / 完形 / 七选五，含其全部题）+ 提分驾驶舱 / 估分器 / 提分雷达 /
 //        考点图谱 / 句式库 / 错题本 永久免费（习惯与转化钩子）。
-// 解锁后：主线 6 关全开（阅读 / 应用文 / 读后续写）与后续更新内容。
+// 解锁后：主线全部 7 关开放（阅读 / 应用文 / 读后续写 / 听力）与后续更新内容。
 // 本地 UserDefaults 缓存即时呈现，启动时 Transaction.currentEntitlements 核验防破解。
 
 final class PurchaseManager: ObservableObject {

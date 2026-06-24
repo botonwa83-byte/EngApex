@@ -18,7 +18,7 @@ struct MockResult {
 
     var totalCorrect: Int { perModule.values.reduce(0) { $0 + $1.correct } }
 
-    /// 本卷覆盖模块的满分合计（无听力内容时为 120，如实标注，不臆造听力分）。
+    /// 本卷覆盖模块的满分合计：按实际抽中的模块如实相加（如某次组卷未抽中听力，则不计入听力满分）。
     var coveredFullScore: Double {
         var s = 0.0
         for m in ExamModule.allCases where (perModule[m]?.total ?? 0) > 0 {
@@ -45,7 +45,7 @@ struct MockResult {
 /// 模考引擎：组卷 + 判分，纯函数可测。
 enum MockEngine {
 
-    /// 组卷：先保证每个模块至少 1 题，再按满分权重补足到 count，随机抽样。
+    /// 组卷：先保证每个模块至少 1 题，再按高考权重(examWeight)比例分配剩余名额，避免大份卷子被单一高权重模块(如阅读)占满。
     static func assemble(count: Int, from bank: [Question]) -> [Question] {
         let byModule = Dictionary(grouping: bank) { $0.module }
         var picked: [Question] = []
@@ -57,14 +57,47 @@ enum MockEngine {
                 picked.append(q); used.insert(q.id)
             }
         }
-        // 2. 按满分权重补足（先打乱，再按模块权重排序，高权重模块优先补）
+
+        // 2. 按权重比例(最大余数法)分配剩余名额，题库不够的模块把名额让给其他模块
         let remaining = max(0, count - picked.count)
-        let shuffledRest: [Question] = bank.filter { !used.contains($0.id) }.shuffled()
-        let pool: [Question] = shuffledRest.sorted { $0.module.fullScore > $1.module.fullScore }
-        for q in pool.prefix(remaining) { picked.append(q); used.insert(q.id) }
+        if remaining > 0 {
+            var quotas = proportionalQuotas(remaining: remaining, modules: ExamModule.allCases)
+            for m in ExamModule.allCases {
+                let available = (byModule[m] ?? []).filter { !used.contains($0.id) }.shuffled()
+                let take = min(quotas[m] ?? 0, available.count)
+                for q in available.prefix(take) { picked.append(q); used.insert(q.id) }
+            }
+            let shortfall = count - picked.count
+            if shortfall > 0 {
+                let leftover = bank.filter { !used.contains($0.id) }.shuffled()
+                    .sorted { $0.module.examWeight > $1.module.examWeight }
+                for q in leftover.prefix(shortfall) { picked.append(q); used.insert(q.id) }
+            }
+        }
 
         // 3. 按模块顺序排列，体验更像真卷
         return picked.sorted { $0.module.rawValue < $1.module.rawValue }
+    }
+
+    /// 把 remaining 个名额按 examWeight 比例分给各模块，最大余数法保证总数精确等于 remaining。
+    private static func proportionalQuotas(remaining: Int, modules: [ExamModule]) -> [ExamModule: Int] {
+        let totalWeight = modules.reduce(0.0) { $0 + $1.examWeight }
+        guard totalWeight > 0 else { return [:] }
+        var raw: [ExamModule: Double] = [:]
+        for m in modules { raw[m] = Double(remaining) * (m.examWeight / totalWeight) }
+        var quotas: [ExamModule: Int] = [:]
+        var assigned = 0
+        for m in modules {
+            let q = Int(raw[m] ?? 0)
+            quotas[m] = q
+            assigned += q
+        }
+        let shortfall = remaining - assigned
+        if shortfall > 0 {
+            let byFraction = modules.sorted { ((raw[$0] ?? 0) - Double(quotas[$0] ?? 0)) > ((raw[$1] ?? 0) - Double(quotas[$1] ?? 0)) }
+            for m in byFraction.prefix(shortfall) { quotas[m, default: 0] += 1 }
+        }
+        return quotas
     }
 
     /// 判分：answers 为 questionId → 所选下标（未作答的题不计入 correct，但计入 total）。

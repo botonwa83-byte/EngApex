@@ -23,6 +23,9 @@ struct PaywallView: View {
                     benefitRow(icon: "pencil.and.scribble", color: .apexMystery,
                                title: "解锁读后续写关 · 25 分高地",
                                desc: "情节链 + 高分句式，化情绪为画面，续写不再无从下笔")
+                    benefitRow(icon: "ear", color: .apexDanger,
+                               title: "解锁听力关 · 30 分预判训练",
+                               desc: "离线语音合成朗读 + 设问预判决策树，场景词/数字修正/态度推断全覆盖")
                     benefitRow(icon: "scope", color: .apexLava,
                                title: "提分雷达对全模块开放",
                                desc: "估分、ROI 排序、错因诊断对 7 个模块全程导航")
