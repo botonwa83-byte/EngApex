@@ -5,6 +5,7 @@ struct ReviewView: View {
     @ObservedObject private var scheduler = ReviewScheduler.shared
     @State private var queue: [String] = []
     @State private var revealed = false
+    @State private var listeningPlayCount = 0
 
     var body: some View {
         Group {
@@ -54,6 +55,9 @@ struct ReviewView: View {
     @ViewBuilder private func front(_ ref: ReviewRef) -> some View {
         switch ref {
         case .question(let q):
+            if let script = q.listeningScript {
+                ListeningPlayerCard(script: script, playCount: $listeningPlayCount, maxPlays: nil)
+            }
             Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
         case .phrase(let p):
             Text(p.en).font(.title3.weight(.semibold)).fixedSize(horizontal: false, vertical: true)
@@ -101,7 +105,7 @@ struct ReviewView: View {
     }
 
     private func advance(removeFirst: Bool) {
-        revealed = false
+        revealed = false; listeningPlayCount = 0
         if removeFirst, !queue.isEmpty { queue.removeFirst() }
     }
 

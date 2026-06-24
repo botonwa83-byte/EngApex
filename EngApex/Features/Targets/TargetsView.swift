@@ -100,6 +100,7 @@ struct QuizView: View {
     @State private var selected: Int?
     @State private var revealed = false
     @State private var showDiagnose = false
+    @State private var listeningPlayCount = 0
 
     private var questions: [Question] { QuestionBank.byLevel(level.id) }
     private var q: Question? { index < questions.count ? questions[index] : nil }
@@ -110,6 +111,9 @@ struct QuizView: View {
                 VStack(alignment: .leading, spacing: Spacing.lg) {
                     header
                     modelNote
+                    if let script = q.listeningScript {
+                        ListeningPlayerCard(script: script, playCount: $listeningPlayCount)
+                    }
                     Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
                     ForEach(Array(q.options.enumerated()), id: \.offset) { i, opt in
                         optionRow(q, i: i, text: opt)
@@ -128,6 +132,15 @@ struct QuizView: View {
         .sheet(isPresented: $showDiagnose) {
             if let q { DiagnoseSheet(question: q) { advance() } }
         }
+        .onAppear { autoPlayIfNeeded() }
+        .onChange(of: index) { _ in autoPlayIfNeeded() }
+    }
+
+    /// 听力题首次出现时自动播放一次，不必让用户先手动点一次才有声音。
+    private func autoPlayIfNeeded() {
+        guard let q, let script = q.listeningScript, listeningPlayCount == 0 else { return }
+        listeningPlayCount += 1
+        SpeechPlayer.shared.play(script)
     }
 
     private var header: some View {
@@ -189,6 +202,13 @@ struct QuizView: View {
             Label(q.trap, systemImage: "exclamationmark.triangle.fill")
                 .font(AppFont.caption).foregroundColor(.apexDanger)
                 .padding(.top, 4)
+            if let script = q.listeningScript {
+                DisclosureGroup("听力原文回看") {
+                    Text(script).font(AppFont.caption).foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true).padding(.top, 4)
+                }
+                .font(AppFont.caption).padding(.top, 4)
+            }
             Button {
                 if selected == q.answer { advance() } else { showDiagnose = true }
             } label: {
@@ -226,7 +246,7 @@ struct QuizView: View {
     }
 
     private func advance() {
-        revealed = false; selected = nil
+        revealed = false; selected = nil; listeningPlayCount = 0
         index += 1
         if index >= questions.count { store.markLevelComplete(level.id) }
     }

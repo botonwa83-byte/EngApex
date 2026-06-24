@@ -1,7 +1,6 @@
 import Foundation
 
-/// 题库（MVP 代表集）。每题带考点标签 + 解题决策树 + 陷阱。
-/// 二期按本结构扩充到每题型 ~30 题。
+/// 题库。每题带考点标签 + 解题决策树 + 陷阱。每题型已扩充到 ~30 题。
 enum QuestionBank {
 
     static let all: [Question] = {
@@ -15,6 +14,9 @@ enum QuestionBank {
         result += extended
         result += extended2
         result += extended3
+        result += extended4
+        result += extended5
+        result += listening
         return result
     }()
 

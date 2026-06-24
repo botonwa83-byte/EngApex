@@ -6,7 +6,8 @@ struct Question: Identifiable, Codable, Equatable {
     let id: String
     let module: ExamModule
     let levelId: String
-    let stem: String          // 题干（完形/语法填空用 ___ 表示空）
+    let stem: String          // 题干（完形/语法填空用 ___ 表示空；听力题干只放设问本身）
+    var listeningScript: String? = nil   // 听力原文：TTS 朗读用，非听力题为 nil（var 是为了让带默认值的字段能被合成的逐成员初始化器覆盖）
     let options: [String]
     let answer: Int           // 正确选项下标
     let pointTag: String      // 考点标签，如"逻辑词·转折"/"非谓语·现在分词"

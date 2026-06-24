@@ -12,6 +12,7 @@ struct MockExamView: View {
     @State private var index = 0
     @State private var elapsed = 0
     @State private var result: MockResult?
+    @State private var listeningPlayCount = 0
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -27,6 +28,14 @@ struct MockExamView: View {
         .navigationTitle("限时模考")
         .navigationBarTitleDisplayMode(.inline)
         .onReceive(timer) { _ in if phase == .exam { elapsed += 1 } }
+        .onChange(of: index) { _ in listeningPlayCount = 0; autoPlayIfNeeded() }
+    }
+
+    /// 听力题首次出现时自动播放一次。
+    private func autoPlayIfNeeded() {
+        guard index < paper.count, let script = paper[index].listeningScript, listeningPlayCount == 0 else { return }
+        listeningPlayCount += 1
+        SpeechPlayer.shared.play(script)
     }
 
     // MARK: Intro
@@ -39,7 +48,7 @@ struct MockExamView: View {
                         .font(AppFont.cardTitle).foregroundColor(.apexLava)
                     Text("自动抽取一套覆盖各题型的卷子，限时作答、交卷后自动判分并折合高考分。")
                         .font(AppFont.caption).foregroundColor(.secondary)
-                    Text("满分 120 分（暂不含听力 30 分，待音频内容上线）")
+                    Text("满分 150 分（含听力，音频为离线语音合成朗读）")
                         .font(AppFont.chip).foregroundColor(.apexGold)
                 }.frame(maxWidth: .infinity, alignment: .leading).cardSurface(padding: Spacing.md)
 
@@ -88,6 +97,9 @@ struct MockExamView: View {
                         Text("\(index + 1)/\(paper.count)").font(AppFont.caption).foregroundColor(.secondary)
                     }
                     ProgressView(value: Double(index + 1), total: Double(paper.count)).tint(.apexLava)
+                    if let script = q.listeningScript {
+                        ListeningPlayerCard(script: script, playCount: $listeningPlayCount)
+                    }
                     Text(q.stem).font(.body).fixedSize(horizontal: false, vertical: true)
                     ForEach(Array(q.options.enumerated()), id: \.offset) { i, opt in
                         Button { answers[q.id] = i } label: {
@@ -188,8 +200,9 @@ struct MockExamView: View {
 
     private func startExam() {
         paper = MockEngine.assemble(count: 14, from: QuestionBank.all)
-        answers = [:]; index = 0; elapsed = 0
+        answers = [:]; index = 0; elapsed = 0; listeningPlayCount = 0
         phase = .exam
+        autoPlayIfNeeded()
     }
 
     private func submit() {

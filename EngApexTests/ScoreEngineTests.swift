@@ -106,6 +106,18 @@ final class ScoreEngineTests: XCTestCase {
         }
     }
 
+    func testListeningQuestionsHaveScript() {
+        let listening = QuestionBank.all.filter { $0.module == .listening }
+        XCTAssertEqual(listening.count, 30)
+        for q in listening {
+            XCTAssertNotNil(q.listeningScript, "听力题 \(q.id) 缺听力原文")
+            XCTAssertFalse(q.listeningScript?.isEmpty ?? true, "听力题 \(q.id) 听力原文为空")
+        }
+        for q in QuestionBank.all where q.module != .listening {
+            XCTAssertNil(q.listeningScript, "非听力题 \(q.id) 不应带听力原文")
+        }
+    }
+
     func testEveryLevelHasQuestions() {
         for level in MainLineData.levels {
             let qs = QuestionBank.byLevel(level.id)
@@ -249,7 +261,7 @@ final class ScoreEngineTests: XCTestCase {
     // MARK: - 限时模考
 
     func testMockAssembleCoversAvailableModules() {
-        let available = Set(QuestionBank.all.map(\.module))   // 现有内容覆盖 6 模块（无听力）
+        let available = Set(QuestionBank.all.map(\.module))   // 组卷应覆盖题库里现有内容的全部模块
         let paper = MockEngine.assemble(count: 14, from: QuestionBank.all)
         XCTAssertEqual(Set(paper.map(\.module)), available, "组卷应覆盖全部有内容的模块")
         XCTAssertEqual(Set(paper.map(\.id)).count, paper.count, "组卷不应出现重复题")
@@ -263,8 +275,8 @@ final class ScoreEngineTests: XCTestCase {
         let r = MockEngine.score(questions: paper, answers: answers)
         XCTAssertEqual(r.totalCorrect, paper.count)
         XCTAssertEqual(r.scaledScore, r.coveredFullScore, accuracy: 0.01, "全对应折合覆盖模块满分")
-        XCTAssertFalse(r.includesListening, "当前无听力内容")
-        XCTAssertEqual(r.coveredFullScore, 120, accuracy: 0.01, "六模块满分合计 120（不含听力 30）")
+        XCTAssertTrue(r.includesListening, "听力题库已上线，组卷应自动覆盖听力")
+        XCTAssertEqual(r.coveredFullScore, 150, accuracy: 0.01, "七模块满分合计 150（含听力 30）")
     }
 
     func testMockScoreZeroAndWeakest() {

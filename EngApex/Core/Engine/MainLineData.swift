@@ -1,6 +1,6 @@
 import Foundation
 
-/// 主线「提分之路」的关卡定义（MVP 6 关）。
+/// 主线「提分之路」的关卡定义（提分七关）。
 /// 顺序按"规则强、易提分"在前排布；提分雷达会叠加在其上动态推荐先打哪关。
 enum MainLineData {
 
@@ -29,6 +29,10 @@ enum MainLineData {
             title: "情节与续写", subtitle: "读后续写 · 25 分",
             modelNote: "情节链:环境→动作→心理→转机。高分技巧:化情绪为身体反应(A chill ran down his spine)、用 as 制造伴随画面、承接上文不跳脱。",
             questionIds: ["k1", "k2", "k3"], isFree: false),
+        MainLevel(id: "L7", order: 7, module: .listening,
+            title: "听力的预判", subtitle: "听力 · 30 分",
+            modelNote: "决策树：听前先扫一遍选项，预判设问类型(地点/数字/态度/原因)，并激活对应场景词；听音频时只抓与设问匹配的信号词，听到即锁定答案，不等全文放完。常见陷阱：同音词干扰、先提及的信息被后文修正、转折词(but/actually)之后才是真正答案。",
+            questionIds: ["ln1", "ln2", "ln3", "ln4", "ln5"], isFree: false),
     ]
 
     static func level(id: String) -> MainLevel? { levels.first { $0.id == id } }
