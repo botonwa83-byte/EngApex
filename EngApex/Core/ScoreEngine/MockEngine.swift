@@ -87,8 +87,35 @@ enum MockEngine {
             }
         }
 
-        // 3. 按模块顺序排列，体验更像真卷
-        return picked.sorted { $0.module.rawValue < $1.module.rawValue }
+        // 3. 按真实考场卷面顺序排列，体验更像真实试卷
+        return picked.sorted { $0.module.examOrderIndex < $1.module.examOrderIndex }
+    }
+
+    /// 完整模考固定的全真模拟卷套数(套卷一~五轮转分割 + 套卷六固定打包)。
+    static let paperCount = 6
+    /// 套卷一(下标 0)免费开放试用，其余套卷需解锁完整模考。
+    static let freePaperIndex = 0
+
+    /// 套卷一~五：固定、互不重复、合起来正好覆盖"套卷六题目之外"的题库全部题目——均为本 app 自研题目，
+    /// 仿真高考真题的题型/难度/考点分布，但不是真实历年高考原题(不臆造具体出处，守诚信红线)。
+    /// 每模块的题先按 id 排序保证可复现，再轮转均分进 5 套，使每套结构相近、且重新进入同一套时题目不变。
+    /// 套卷六：单独成套，不参与轮转，即 QuestionBank.paper6 本身(见该常量定义)。
+    static func fixedPapers(from bank: [Question]) -> [[Question]] {
+        let paper6Ids = Set(QuestionBank.paper6.map(\.id))
+        let rotatingBank = bank.filter { !paper6Ids.contains($0.id) }
+        let rotatingCount = paperCount - 1
+
+        var papers: [[Question]] = Array(repeating: [], count: rotatingCount)
+        let byModule = Dictionary(grouping: rotatingBank) { $0.module }
+        for module in ExamModule.allCases {
+            let pool = (byModule[module] ?? []).sorted { $0.id < $1.id }
+            for (i, q) in pool.enumerated() {
+                papers[i % rotatingCount].append(q)
+            }
+        }
+        var result = papers.map { $0.sorted { $0.module.examOrderIndex < $1.module.examOrderIndex } }
+        result.append(QuestionBank.paper6)
+        return result
     }
 
     /// 把 remaining 个名额按 examWeight 比例分给各模块，最大余数法保证总数精确等于 remaining。
@@ -133,26 +160,48 @@ enum MockEngine {
     }
 }
 
-/// 模考成绩持久化（上次 / 最佳 / 次数）。
+/// 模考成绩持久化：全局聚合(上次 / 最佳 / 次数，供驾驶舱等概览用) + 快速模考单独统计 +
+/// 完整模考 6 套全真模拟卷各自的独立统计(下标 0...5 对应套卷一...六，可分别追踪、反复重考)。
 final class MockManager: ObservableObject {
     static let shared = MockManager()
+
+    struct Stats: Codable { var last: Double = 0; var best: Double = 0; var count: Int = 0 }
+
     @Published private(set) var lastScore: Double = 0
     @Published private(set) var bestScore: Double = 0
     @Published private(set) var count: Int = 0
-    private let key = "mockmanager.v1"
+    @Published private(set) var quick: Stats = Stats()
+    @Published private(set) var papers: [Stats] = Array(repeating: Stats(), count: MockEngine.paperCount)
+
+    private let key = "mockmanager.v2"
 
     private init() { load() }
 
-    func recordResult(_ score: Double) {
-        lastScore = score
-        bestScore = max(bestScore, score)
-        count += 1
+    func recordQuickResult(_ score: Double) {
+        quick.last = score; quick.best = max(quick.best, score); quick.count += 1
+        recordGlobal(score)
         save()
     }
 
-    private struct Blob: Codable { var last: Double; var best: Double; var count: Int }
+    func recordPaperResult(_ paperIndex: Int, _ score: Double) {
+        guard papers.indices.contains(paperIndex) else { return }
+        papers[paperIndex].last = score
+        papers[paperIndex].best = max(papers[paperIndex].best, score)
+        papers[paperIndex].count += 1
+        recordGlobal(score)
+        save()
+    }
+
+    private func recordGlobal(_ score: Double) {
+        lastScore = score
+        bestScore = max(bestScore, score)
+        count += 1
+    }
+
+    private struct Blob: Codable { var last: Double; var best: Double; var count: Int; var quick: Stats; var papers: [Stats] }
     private func save() {
-        if let d = try? JSONEncoder().encode(Blob(last: lastScore, best: bestScore, count: count)) {
+        let blob = Blob(last: lastScore, best: bestScore, count: count, quick: quick, papers: papers)
+        if let d = try? JSONEncoder().encode(blob) {
             UserDefaults.standard.set(d, forKey: key)
         }
     }
@@ -160,5 +209,7 @@ final class MockManager: ObservableObject {
         guard let d = UserDefaults.standard.data(forKey: key),
               let b = try? JSONDecoder().decode(Blob.self, from: d) else { return }
         lastScore = b.last; bestScore = b.best; count = b.count
+        quick = b.quick
+        papers = b.papers.count == MockEngine.paperCount ? b.papers : Array(repeating: Stats(), count: MockEngine.paperCount)
     }
 }

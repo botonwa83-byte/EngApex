@@ -72,6 +72,9 @@ enum ExamModule: String, CaseIterable, Identifiable, Codable {
         allCases.reduce(0) { $0 + $1.fullScore }   // 150
     }
 
+    /// 真实考场卷面顺序(听力→阅读→七选五→完形→语法填空→应用文→读后续写)在 allCases 里的下标，供模考组卷排序用。
+    var examOrderIndex: Int { Self.allCases.firstIndex(of: self) ?? 0 }
+
     /// SF Symbol 图标（驾驶舱/靶场列表用）。
     var icon: String {
         switch self {

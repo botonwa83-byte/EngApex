@@ -3,7 +3,7 @@ import Foundation
 /// 句式 / 词块库（图鉴 Tab）。读后续写与应用文的高分弹药，可加入复习。
 enum PhraseBook {
 
-    static let all: [PhraseCard] = base + extended
+    static let all: [PhraseCard] = base + extended + roundD
 
     static let base: [PhraseCard] = [
         // 读后续写·开头/画面
@@ -172,6 +172,157 @@ enum PhraseBook {
             en: "Those interested are welcome to sign up by emailing the Students' Union before Friday.",
             zh: "有意者可在周五前邮件联系学生会报名。",
             usage: "通知/海报类报名方式的标准表达，信息要素(方式+截止时间)一句给全。"),
+    ]
+
+    /// 三期扩充（36 → 68 张）：续写画面/高级动词/加分句式各 +6，应用文补六体裁结尾句 +6，熟词僻义 +8。
+    static let roundD: [PhraseCard] = roundD1 + roundD2 + roundD3 + roundD4 + roundD5
+
+    static let roundD1: [PhraseCard] = [
+        // 续写开头/画面
+        PhraseCard(id: "p29", category: .continuationOpener,
+            en: "The old clock on the wall ticked loudly in the empty corridor.",
+            zh: "走廊空荡荡的，墙上的旧钟滴答作响。",
+            usage: "用环境声音衬托空旷与紧张，无需直接写'安静'二字。"),
+        PhraseCard(id: "p30", category: .continuationOpener,
+            en: "Snow had been falling since dawn, blanketing the village in silence.",
+            zh: "雪从清晨就开始下，给整个村子盖上了一层寂静的白色。",
+            usage: "用天气整体铺垫氛围，为接下来的情节定调。"),
+        PhraseCard(id: "p31", category: .continuationOpener,
+            en: "A single light flickered at the end of the long, narrow alley.",
+            zh: "一盏孤灯在狭长的巷子尽头闪烁。",
+            usage: "聚焦一个具体细节(灯)制造悬念与方向感，引导读者视线。"),
+        PhraseCard(id: "p32", category: .continuationOpener,
+            en: "The smell of burning wood drifted through the cool night air.",
+            zh: "燃木的气味在清冷的夜空中弥漫开来。",
+            usage: "用嗅觉细节增强画面真实感，是续写中常被忽略的感官维度。"),
+        PhraseCard(id: "p33", category: .continuationOpener,
+            en: "Thunder rumbled in the distance, promising a storm before nightfall.",
+            zh: "远处雷声隆隆，预示着夜幕降临前将有一场风暴。",
+            usage: "用天气变化铺垫即将发生的转折，给情节增加张力。"),
+        PhraseCard(id: "p34", category: .continuationOpener,
+            en: "Her footsteps echoed against the cold stone floor as she walked alone.",
+            zh: "她独自走着，脚步声在冰冷的石地板上回响。",
+            usage: "声音细节+孤独感画面并行开篇，容易让读者迅速代入。"),
+    ]
+
+    static let roundD2: [PhraseCard] = [
+        // 高级动词替换
+        PhraseCard(id: "p35", category: .advancedVerb,
+            en: "shatter / crumble（替换 break）",
+            zh: "粉碎，破碎 / 崩塌，瓦解",
+            usage: "Her confidence shattered in that instant. 写情绪或信念瞬间崩溃，比 break 更有冲击力。"),
+        PhraseCard(id: "p36", category: .advancedVerb,
+            en: "linger / dwell on（替换 stay in one's mind）",
+            zh: "萦绕，徘徊 / 沉浸于(回忆、情绪)",
+            usage: "The memory lingered in her mind for days. 比 stayed 更含蓄、更有余味。"),
+        PhraseCard(id: "p37", category: .advancedVerb,
+            en: "tremble / quiver（替换 shake）",
+            zh: "颤抖 / 微微发抖",
+            usage: "His hands trembled as he opened the letter. 写紧张或寒冷时的身体反应，比 shake 更精准细腻。"),
+        PhraseCard(id: "p38", category: .advancedVerb,
+            en: "drift（替换 think randomly / float slowly）",
+            zh: "(思绪)飘移，游离 / (物体)漂流",
+            usage: "Her thoughts drifted back to that summer afternoon. 写思绪不自觉地回到某段记忆。"),
+        PhraseCard(id: "p39", category: .advancedVerb,
+            en: "vanish / fade（替换 disappear）",
+            zh: "突然消失 / 逐渐淡去",
+            usage: "vanish 强调瞬间消失，fade 强调慢慢淡去，比 disappear 更有画面层次。"),
+        PhraseCard(id: "p40", category: .advancedVerb,
+            en: "clutch / clasp（替换 hold tightly）",
+            zh: "紧抓，紧握",
+            usage: "She clutched the letter to her chest. 比 held it tightly 更有情绪张力。"),
+    ]
+
+    static let roundD3: [PhraseCard] = [
+        // 加分句式
+        PhraseCard(id: "p41", category: .sentencePattern,
+            en: "Hardly had she finished speaking when the audience burst into applause.",
+            zh: "她话音刚落，观众就爆发出了掌声。",
+            usage: "Hardly…when 倒装，写'刚……就……'的紧密承接，比简单的 As soon as 更显文采。"),
+        PhraseCard(id: "p42", category: .sentencePattern,
+            en: "So determined was he that no failure could make him quit.",
+            zh: "他如此坚定，没有任何失败能让他放弃。",
+            usage: "So + 形容词 置于句首引发部分倒装，强调程度，适合塑造人物品质。"),
+        PhraseCard(id: "p43", category: .sentencePattern,
+            en: "What matters most is not the result, but the effort behind it.",
+            zh: "最重要的不是结果，而是背后的努力。",
+            usage: "What 引导的主语从句+ not…but… 句式，提升议论文/续写结尾的总结档次。"),
+        PhraseCard(id: "p44", category: .sentencePattern,
+            en: "Little did she know that this decision would change her whole life.",
+            zh: "她不知道，这个决定将改变她的一生。",
+            usage: "Little 置于句首引发部分倒装，制造命运感的叙述语气，续写埋伏笔常用。"),
+        PhraseCard(id: "p45", category: .sentencePattern,
+            en: "There is no denying that hard work always pays off in the end.",
+            zh: "不可否认，努力终将得到回报。",
+            usage: "There is no denying that… 强调句型，议论文/应用文总结句加分常用。"),
+        PhraseCard(id: "p46", category: .sentencePattern,
+            en: "Only when we lose something do we realize how precious it was.",
+            zh: "只有当我们失去某物时，才会意识到它有多珍贵。",
+            usage: "Only when 状语前置触发部分倒装，常用于续写结尾的哲理升华句。"),
+    ]
+
+    static let roundD4: [PhraseCard] = [
+        // 应用文·分体裁结尾句（与 p23-p28 的开头句一一对应）
+        PhraseCard(id: "p47", category: .applied,
+            en: "I would be extremely grateful for any advice you could offer on this matter.",
+            zh: "如果您能就此事给我提供任何建议，我将非常感激。",
+            usage: "求助信结尾，礼貌地再次强调对建议的渴望，呼应 p23 的求助开头。"),
+        PhraseCard(id: "p48", category: .applied,
+            en: "I do hope you will take these suggestions into consideration.",
+            zh: "真心希望您能考虑这些建议。",
+            usage: "建议信结尾常用句，语气诚恳又不失分量，呼应 p24 的建议开头。"),
+        PhraseCard(id: "p49", category: .applied,
+            en: "Once again, thank you from the bottom of my heart for everything you did.",
+            zh: "再次从心底感谢您所做的一切。",
+            usage: "感谢信结尾强化感激之情，呼应 p25 的感谢开头，首尾呼应更完整。"),
+        PhraseCard(id: "p50", category: .applied,
+            en: "I promise this will never happen again, and I hope you can forgive me.",
+            zh: "我保证这种事不会再发生，希望您能原谅我。",
+            usage: "道歉信结尾的标配结构：给出保证 + 请求谅解，呼应 p26 的道歉开头。"),
+        PhraseCard(id: "p51", category: .applied,
+            en: "For further information, please feel free to contact the Students' Union.",
+            zh: "如需了解更多信息，请随时联系学生会。",
+            usage: "通知结尾的标准联系方式句，信息要素完整，呼应 p27 的通知开头。"),
+        PhraseCard(id: "p52", category: .applied,
+            en: "Don't miss this wonderful opportunity — see you there!",
+            zh: "别错过这个精彩的机会——到时见！",
+            usage: "海报结尾的号召性用语，简短有力，符合海报的视觉与语气特点，呼应 p28。"),
+    ]
+
+    static let roundD5: [PhraseCard] = [
+        // 熟词僻义档案（续）
+        PhraseCard(id: "v9", category: .polysemy,
+            en: "object　常义：n. 物体",
+            zh: "僻义：vi. 反对(object to sth)",
+            usage: "Many local residents object to building a new airport nearby. 许多当地居民反对在附近新建机场。"),
+        PhraseCard(id: "v10", category: .polysemy,
+            en: "party　常义：n. 聚会",
+            zh: "僻义：n. 一方，当事方",
+            usage: "Both parties agreed to sign the contract by Friday. 双方都同意在周五前签署合同。"),
+        PhraseCard(id: "v11", category: .polysemy,
+            en: "right　常义：adj. 正确的；右边的",
+            zh: "僻义：n. 权利",
+            usage: "Every citizen has the right to a fair trial. 每个公民都有获得公正审判的权利。"),
+        PhraseCard(id: "v12", category: .polysemy,
+            en: "sound　常义：n. 声音",
+            zh: "僻义：adj. 健全的，可靠的",
+            usage: "Her plan was based on sound financial advice. 她的计划基于可靠的财务建议。"),
+        PhraseCard(id: "v13", category: .polysemy,
+            en: "run　常义：v. 跑",
+            zh: "僻义：vt. 经营，管理",
+            usage: "She has run this small bakery for over twenty years. 她经营这家小面包店已经二十多年了。"),
+        PhraseCard(id: "v14", category: .polysemy,
+            en: "check　常义：v. 检查",
+            zh: "僻义：vt. 制止，抑制(check the spread of)",
+            usage: "New measures were introduced to check the spread of the disease. 新措施被引入以抑制疾病的传播。"),
+        PhraseCard(id: "v15", category: .polysemy,
+            en: "point　常义：n. 点",
+            zh: "僻义：n. 意义，作用(There's no point in doing sth)",
+            usage: "There's no point in arguing about something we can't change. 争论我们无法改变的事毫无意义。"),
+        PhraseCard(id: "v16", category: .polysemy,
+            en: "book　常义：n. 书",
+            zh: "僻义：vt. 预订",
+            usage: "We managed to book the last two tickets for the evening show. 我们设法订到了晚场演出的最后两张票。"),
     ]
 
     static func cards(in category: PhraseCategory) -> [PhraseCard] {

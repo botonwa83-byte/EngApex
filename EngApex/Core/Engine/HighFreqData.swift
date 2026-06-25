@@ -7,7 +7,7 @@ enum HighFreqData {
         var r: [HighFreqPoint] = []
         r += grammar; r += clozePoints; r += readingPoints
         r += sevenPoints; r += writingPoints; r += continuationPoints
-        r += extra
+        r += extra; r += round2
         return r
     }()
 
@@ -192,4 +192,156 @@ enum HighFreqData {
     ]
 
     static func find(_ id: String) -> HighFreqPoint? { all.first { $0.id == id } }
+
+    /// 三期补充高频考点（30 → 56），覆盖七选五等此前过薄的模块，并为应用文六体裁/续写补齐细分技巧点。
+    static let round2: [HighFreqPoint] = round2Grammar + round2Cloze + round2Reading
+        + round2Seven + round2Writing + round2Continuation
+
+    static let round2Grammar: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_modal", module: .grammarFill, name: "情态动词推测",
+            frequencyWeight: 0.70,
+            digest: "有依据的肯定推测用 must；可能性用 may/might；强烈质疑用否定推测 can't。",
+            example: "The light is still on; she ___ be working late. → must（灯亮=有依据）",
+            linkedLevelId: "L1", linkedQuestionIds: ["g16"]),
+        HighFreqPoint(id: "hf_prepfixed", module: .grammarFill, name: "介词固定搭配",
+            frequencyWeight: 0.75,
+            digest: "be good at／depend on／focus on——固定搭配的介词不能凭中文直译猜。",
+            example: "Whether you succeed largely depends ___ how hard you work. → on",
+            linkedLevelId: "L1", linkedQuestionIds: ["g7", "g13"]),
+        HighFreqPoint(id: "hf_absolute", module: .grammarFill, name: "独立主格结构",
+            frequencyWeight: 0.55,
+            digest: "逗号前是‘名词+分词’且逻辑主语与主句不同→独立主格：主动用 -ing，被动/完成用 -ed。",
+            example: "The sun having set, the temperature dropped sharply.",
+            linkedLevelId: "L1", linkedQuestionIds: ["g29", "g15"]),
+        HighFreqPoint(id: "hf_adverbialconn", module: .grammarFill, name: "状语从句逻辑词",
+            frequencyWeight: 0.65,
+            digest: "Once 一旦／Unless 除非／Whereas 然而——先判前后句的逻辑关系再选连词。",
+            example: "Once you understand the rule, the rest becomes much easier.",
+            linkedLevelId: "L1", linkedQuestionIds: ["g24"]),
+        HighFreqPoint(id: "hf_article", module: .grammarFill, name: "冠词 a/an/the",
+            frequencyWeight: 0.45,
+            digest: "a/an 看读音不看字母：useful 开头辅音音素 /j/ 仍用 a；特指或独一无二的事物用 the。",
+            example: "What ___ useful piece of advice! → a（useful 读音以辅音 /j/ 开头）",
+            linkedLevelId: "L1", linkedQuestionIds: ["g17"]),
+    ]
+
+    static let round2Cloze: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_noundiff", module: .cloze, name: "名词辨析",
+            frequencyWeight: 0.65,
+            digest: "抓住前后行为推断情感色彩：苦练数小时透出的是 passion(热情)而非 doubt/fear。",
+            example: "His ___ for music drove him to practice six hours a day. → passion",
+            linkedLevelId: "L2", linkedQuestionIds: ["c17"]),
+        HighFreqPoint(id: "hf_prepphrase", module: .cloze, name: "介词短语固定搭配",
+            frequencyWeight: 0.70,
+            digest: "thanks to(多亏)／in spite of(尽管)／regardless of(不顾)——先判语义方向再选介词短语。",
+            example: "The project succeeded, thanks to the whole team's effort.",
+            linkedLevelId: "L2", linkedQuestionIds: ["c16", "c27"]),
+        HighFreqPoint(id: "hf_emotionword", module: .cloze, name: "情感正负词选择",
+            frequencyWeight: 0.60,
+            digest: "先判断上下文事件的褒贬方向，再选同方向的形容词/名词，排除反向干扰项。",
+            example: "He gives away his old books for free; everyone calls him ___. → generous",
+            linkedLevelId: "L2", linkedQuestionIds: ["c21"]),
+        HighFreqPoint(id: "hf_synonymtrap", module: .cloze, name: "近义词陷阱",
+            frequencyWeight: 0.65,
+            digest: "eager/willing(乐意) 与 reluctant(不情愿) 词义相近却方向相反——细节决定方向，不可只凭印象选。",
+            example: "He was clearly ___ to admit his mistake, mumbling excuses. → reluctant",
+            linkedLevelId: "L2", linkedQuestionIds: ["c25"]),
+    ]
+
+    static let round2Reading: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_titlechoice", module: .reading, name: "标题选择",
+            frequencyWeight: 0.80,
+            digest: "标题须概括全文人物+主题，排除只是某个情节细节或片面信息的选项。",
+            example: "全文写 68 岁奶奶开始识字学习 → 标题选‘永远不晚’而非‘如何写信’",
+            linkedLevelId: "L4", linkedQuestionIds: ["r6", "r11", "r19"]),
+        HighFreqPoint(id: "hf_paragraphfunc", module: .reading, name: "段落作用/论证功能",
+            frequencyWeight: 0.65,
+            digest: "问‘为什么提到…’多考论证功能：是补充原因、举例还是转折，别选成‘作者建议/态度’类误判。",
+            example: "提到 tall buildings blocking wind → 是在补充加剧热岛效应的另一因素",
+            linkedLevelId: "L4", linkedQuestionIds: ["r32", "r34"]),
+        HighFreqPoint(id: "hf_databreakdown", module: .reading, name: "数据细节定位",
+            frequencyWeight: 0.55,
+            digest: "数字类细节题直接回原文定位关键句，警惕文中出现的其他干扰数字(不同时间点/不同对象)。",
+            example: "How many prototypes failed? 回文定位 three failed prototypes → Three",
+            linkedLevelId: "L4", linkedQuestionIds: ["r5", "r22", "r28"]),
+    ]
+
+    static let round2Seven: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_topicsentence", module: .sevenChoose, name: "总起/总结句定位",
+            frequencyWeight: 0.80,
+            digest: "空后跟 First…Then… 或空前是 In short 等总结语→该空应是统领全段的总起/总结句。",
+            example: "___ First, choose a quiet place. Then, set a clear goal. → Here are some tips for studying effectively.",
+            linkedLevelId: "L3", linkedQuestionIds: ["s5", "s12"]),
+        HighFreqPoint(id: "hf_causeeffect7", module: .sevenChoose, name: "因果逻辑链",
+            frequencyWeight: 0.75,
+            digest: "看到 As a result/therefore，空处应是导致该结果的直接原因，而非无关或矛盾的陈述。",
+            example: "___ As a result, the floods stopped happening. → The roots held the soil firmly in place.",
+            linkedLevelId: "L3", linkedQuestionIds: ["s14", "s27"]),
+        HighFreqPoint(id: "hf_refconsistency", module: .sevenChoose, name: "代词/数字指代一致",
+            frequencyWeight: 0.70,
+            digest: "空后出现 They/Their/it 等代词，空处补的句子必须包含对应单复数先行词，话题不能跳。",
+            example: "Volunteers cleaned the beach. ___ Their hard work paid off. → They collected over a hundred bags of trash.",
+            linkedLevelId: "L3", linkedQuestionIds: ["s10"]),
+        HighFreqPoint(id: "hf_trapdistractor", module: .sevenChoose, name: "干扰项特征识别",
+            frequencyWeight: 0.60,
+            digest: "干扰项常见两种坑：与上下文事实矛盾，或话题/指代对象跑偏——读完前后句先排除这两类。",
+            example: "‘排队抢购’的前一句若选‘涨价/关门’，与结果矛盾，直接排除。",
+            linkedLevelId: "L3", linkedQuestionIds: ["s25", "s27"]),
+    ]
+
+    static let round2Writing: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_aw_suggest", module: .appliedWriting, name: "建议信句式",
+            frequencyWeight: 0.70,
+            digest: "I am writing to suggest that…／May I suggest doing…?——建议要委婉，避免 should/must 式命令语气。",
+            example: "May I suggest adding more speaking practice to the class?",
+            linkedLevelId: "L5", linkedQuestionIds: ["a8", "a16"]),
+        HighFreqPoint(id: "hf_aw_thanks", module: .appliedWriting, name: "感谢信细节化",
+            frequencyWeight: 0.65,
+            digest: "先用 grateful for 概括感谢，再用 In particular 过渡到一个具体细节，避免空泛笼统。",
+            example: "In particular, I really enjoyed the cultural workshop on the second day.",
+            linkedLevelId: "L5", linkedQuestionIds: ["a18", "a28"]),
+        HighFreqPoint(id: "hf_aw_apology", module: .appliedWriting, name: "道歉信句式",
+            frequencyWeight: 0.65,
+            digest: "apologize for (not) doing 点明致歉事由；委婉拒绝用 I'm afraid + but thank you for… 缓和语气。",
+            example: "I'm writing to apologize for not being able to make it to your party.",
+            linkedLevelId: "L5", linkedQuestionIds: ["a13", "a24"]),
+        HighFreqPoint(id: "hf_aw_notice", module: .appliedWriting, name: "通知信息要素",
+            frequencyWeight: 0.70,
+            digest: "通知必须信息完整：对象+事项+时间+地点一句给全，列举多项用 In addition/Besides 衔接。",
+            example: "In addition, we will visit the local science museum in the afternoon.",
+            linkedLevelId: "L5", linkedQuestionIds: ["a14"]),
+        HighFreqPoint(id: "hf_aw_lostfound", module: .appliedWriting, name: "寻物启事/海报要素",
+            frequencyWeight: 0.55,
+            digest: "寻物启事/海报类同样要素优先：物品特征+丢失(或活动)时间+地点一句说清，避免情绪化空话。",
+            example: "I lost my black backpack somewhere near the school library yesterday afternoon.",
+            linkedLevelId: "L5", linkedQuestionIds: ["a25"]),
+        HighFreqPoint(id: "hf_aw_appeal", module: .appliedWriting, name: "委婉呼吁结尾",
+            frequencyWeight: 0.60,
+            digest: "反映问题类信件结尾用 sincerely hope + can be improved 的被动语态表达期望，避免生硬或带威胁意味。",
+            example: "I sincerely hope the canteen service can be improved soon.",
+            linkedLevelId: "L5", linkedQuestionIds: ["a27"]),
+    ]
+
+    static let round2Continuation: [HighFreqPoint] = [
+        HighFreqPoint(id: "hf_dialogue", module: .continuation, name: "对话表现人物",
+            frequencyWeight: 0.70,
+            digest: "直接引语+伴随动作比间接转述更有现场感：whispered/gripping 比 she said 更传神。",
+            example: "\"We can't give up now,\" she whispered, gripping his hand tightly.",
+            linkedLevelId: "L6", linkedQuestionIds: ["k8", "k20"]),
+        HighFreqPoint(id: "hf_echo", module: .continuation, name: "首尾呼应",
+            frequencyWeight: 0.65,
+            digest: "结尾呼应开头给出的意象或情绪(如雨/担忧)，用 just like 等关联词把意象与心情挂钩，升华主题。",
+            example: "By the time he got home, the rain had finally stopped, just like his worries.",
+            linkedLevelId: "L6", linkedQuestionIds: ["k28", "k30"]),
+        HighFreqPoint(id: "hf_suspense", module: .continuation, name: "悬念铺垫",
+            frequencyWeight: 0.60,
+            digest: "用未解的疑问、突然的寂静或逼近的脚步声留白，比直接说破‘紧张/害怕’更抓人。",
+            example: "A heavy silence fell over the classroom as every eye turned to the door.",
+            linkedLevelId: "L6", linkedQuestionIds: ["k14", "k16"]),
+        HighFreqPoint(id: "hf_climaxpace", module: .continuation, name: "高潮节奏",
+            frequencyWeight: 0.65,
+            digest: "高潮处用连续强动词(grabbed→threw on→dashed)或群体反应(burst into cheers)制造画面与节奏感。",
+            example: "She grabbed her bag, threw on her coat, and dashed out the door.",
+            linkedLevelId: "L6", linkedQuestionIds: ["k11", "k15"]),
+    ]
 }

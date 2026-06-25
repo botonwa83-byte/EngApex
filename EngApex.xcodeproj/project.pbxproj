@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		CF4C44AA713E4F96A9FFD137 /* QuestionBank+Extended6.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */; };
+		6BA9AA3B2117417EB91225E4 /* QuestionBank+Extended7.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E4568EAAF14EFAA840149C /* QuestionBank+Extended7.swift */; };
+		643BE2EE6FBA4497B283A17A /* QuestionBank+Extended8.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B3325216DD34965ACAC5401 /* QuestionBank+Extended8.swift */; };
 		2ABE79A4CA6F485B9D6FFFB0 /* WritingCoachEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF75510694634436968FE13D /* WritingCoachEngine.swift */; };
 		79E4E31DD1AB4BCD95CE5A21 /* WritingCoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5882E56190EF4539A3F96C35 /* WritingCoachView.swift */; };
 		470EDA08D8894AA9BC2864CF /* VocabWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA01CC9A0ECA43108C6AF007 /* VocabWord.swift */; };
@@ -74,6 +76,8 @@
 
 /* Begin PBXFileReference section */
 		DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended6.swift"; sourceTree = "<group>"; };
+		79E4568EAAF14EFAA840149C /* QuestionBank+Extended7.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended7.swift"; sourceTree = "<group>"; };
+		1B3325216DD34965ACAC5401 /* QuestionBank+Extended8.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "QuestionBank+Extended8.swift"; sourceTree = "<group>"; };
 		EF75510694634436968FE13D /* WritingCoachEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingCoachEngine.swift; sourceTree = "<group>"; };
 		5882E56190EF4539A3F96C35 /* WritingCoachView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingCoachView.swift; sourceTree = "<group>"; };
 		FA01CC9A0ECA43108C6AF007 /* VocabWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWord.swift; sourceTree = "<group>"; };
@@ -343,6 +347,8 @@
 				21892ADC0099F248948CF241 /* QuestionBank+Extended4.swift */,
 				744082FE09181D25DE6CB42C /* QuestionBank+Extended5.swift */,
 				DF37524C6B084BDAAAD398AF /* QuestionBank+Extended6.swift */,
+				79E4568EAAF14EFAA840149C /* QuestionBank+Extended7.swift */,
+				1B3325216DD34965ACAC5401 /* QuestionBank+Extended8.swift */,
 				4609E1A4645040CB8BAFD20F /* QuestionBank+HardTier.swift */,
 				C6C9ADA24A20662B81F9CA35 /* QuestionBank+Listening.swift */,
 				D00D4B6307CA40388253006E /* QuestionBank+PassageDrill.swift */,
@@ -502,6 +508,8 @@
 				50D8026F6E843C40042E2CA0 /* QuestionBank+Extended2.swift in Sources */,
 				7D88E8208FB38A0AB6921B1D /* QuestionBank+Extended3.swift in Sources */,
 				CF4C44AA713E4F96A9FFD137 /* QuestionBank+Extended6.swift in Sources */,
+				6BA9AA3B2117417EB91225E4 /* QuestionBank+Extended7.swift in Sources */,
+				643BE2EE6FBA4497B283A17A /* QuestionBank+Extended8.swift in Sources */,
 				D800A9FE82D21FC1CF1BF2B2 /* QuestionBank+Extended4.swift in Sources */,
 				AE9922A19D0552F04B167132 /* QuestionBank+Extended5.swift in Sources */,
 				30C699A2EEBDF9D5F80CAB66 /* QuestionBank+Listening.swift in Sources */,

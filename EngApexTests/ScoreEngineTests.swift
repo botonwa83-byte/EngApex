@@ -145,7 +145,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testVocabDataIntegrity() {
         let all = VocabData.all
-        XCTAssertEqual(all.count, 55, "词汇专项二期扩充后应有 55 词")
+        XCTAssertEqual(all.count, 95, "词汇专项三期扩充后应有 95 词")
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "单词 ID 必须唯一")
         XCTAssertEqual(Set(all.map(\.headword)).count, all.count, "单词拼写必须唯一")
         for w in all {
@@ -218,7 +218,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testListeningQuestionsHaveScript() {
         let listening = QuestionBank.all.filter { $0.module == .listening }
-        XCTAssertEqual(listening.count, 33)
+        XCTAssertEqual(listening.count, 58)
         for q in listening {
             XCTAssertNotNil(q.listeningScript, "听力题 \(q.id) 缺听力原文")
             XCTAssertFalse(q.listeningScript?.isEmpty ?? true, "听力题 \(q.id) 听力原文为空")
@@ -267,7 +267,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testPhraseBookIntegrity() {
         let all = PhraseBook.all
-        XCTAssertEqual(all.count, 36)
+        XCTAssertEqual(all.count, 68)
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "句式卡 ID 必须唯一")
         for cat in PhraseCategory.allCases {
             XCTAssertFalse(PhraseBook.cards(in: cat).isEmpty, "类目 \(cat.title) 不应为空")
@@ -346,7 +346,7 @@ final class ScoreEngineTests: XCTestCase {
 
     func testHighFreqDataIntegrity() {
         let all = HighFreqData.all
-        XCTAssertEqual(all.count, 30)
+        XCTAssertEqual(all.count, 56)
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "高频考点 ID 必须唯一")
         for p in all {
             XCTAssertTrue((0...1).contains(p.frequencyWeight))
@@ -418,6 +418,44 @@ final class ScoreEngineTests: XCTestCase {
         }
         let readingShare = Double(counts[.reading] ?? 0) / Double(paper.count)
         XCTAssertLessThan(readingShare, 0.45, "阅读权重最高(25%)，但大卷不应被单一模块吃满，应远低于满卷比例")
+    }
+
+    func testFixedPapersCoverWholeBankWithNoOverlap() {
+        let papers = MockEngine.fixedPapers(from: QuestionBank.all)
+        XCTAssertEqual(papers.count, MockEngine.paperCount, "完整模考应固定为 6 套")
+        let allIds = papers.flatMap { $0.map(\.id) }
+        XCTAssertEqual(Set(allIds).count, allIds.count, "6 套之间不应有重复题")
+        XCTAssertEqual(Set(allIds), Set(QuestionBank.all.map(\.id)), "6 套合起来应正好覆盖题库全部题目")
+    }
+
+    func testFixedPapersAreDeterministicAndBalanced() {
+        let first = MockEngine.fixedPapers(from: QuestionBank.all)
+        let second = MockEngine.fixedPapers(from: QuestionBank.all)
+        XCTAssertEqual(first.map { $0.map(\.id) }, second.map { $0.map(\.id) }, "同一题库多次组卷应得到完全相同的 6 套(可反复重考同一套)")
+
+        for paper in first {
+            XCTAssertEqual(paper.map(\.module.examOrderIndex), paper.map(\.module.examOrderIndex).sorted(), "卷面应按真实考场顺序(听力→阅读→七选五→完形→语法填空→应用文→读后续写)排列")
+        }
+
+        for module in ExamModule.allCases {
+            let counts = first.map { paper in paper.filter { $0.module == module }.count }
+            XCTAssertLessThanOrEqual(counts.max()! - counts.min()!, 1, "\(module.title) 在 6 套之间的题量差异不应超过 1 题")
+        }
+    }
+
+    func testPaper6IsFixedDedicatedBatchAndLegacyPapersUnaffected() {
+        let paper6 = QuestionBank.paper6
+        XCTAssertEqual(Set(paper6.map(\.id)), Set(QuestionBank.extended8.map(\.id)), "套卷六应正好是第六批新增题目，不与套卷一~五的轮转分割混在一起")
+
+        let papers = MockEngine.fixedPapers(from: QuestionBank.all)
+        XCTAssertEqual(Set(papers[MockEngine.paperCount - 1].map(\.id)), Set(paper6.map(\.id)), "fixedPapers 的最后一套应正好是套卷六")
+        for paper in papers.dropLast() {
+            for q in paper { XCTAssertFalse(Set(paper6.map(\.id)).contains(q.id), "套卷一~五不应混入套卷六的题目") }
+        }
+    }
+
+    func testFreePaperIsAccessibleWithoutUnlock() {
+        XCTAssertEqual(MockEngine.freePaperIndex, 0, "套卷一应为免费试用套卷")
     }
 
     func testMockScoreZeroAndWeakest() {

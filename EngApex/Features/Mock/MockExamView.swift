@@ -18,14 +18,17 @@ struct MockExamView: View {
     @State private var listeningPlayCount = 0
     @State private var timedOut = false
     @State private var mockLength: MockLength = .quick
+    @State private var selectedPaper: Int = 0
 
-    /// 快速模考用于碎片时间的题型抽样；完整模考更接近真实考场的题量与心理负荷。
+    /// 快速模考用于碎片时间的题型抽样；完整模考是 6 套固定全真模拟卷(套卷一免费试用)，合起来覆盖题库全部题目，可反复重考追踪进步。
+    /// 注：题目均为本 app 自研、仿真考点与难度分布，非真实历年高考原题，UI 文案不用"真题"以免误导。
     enum MockLength: String, CaseIterable, Identifiable {
         case quick, full
         var id: String { rawValue }
-        var label: String { self == .quick ? "快速模考 · 14 题" : "完整模考 · 50 题" }
-        var count: Int { self == .quick ? 14 : 50 }
+        var label: String { self == .quick ? "快速模考 · 14 题" : "完整模考 · 6 套全真模拟卷" }
     }
+    private static let quickCount = 14
+    private static let paperNumerals = ["一", "二", "三", "四", "五", "六"]
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -68,8 +71,13 @@ struct MockExamView: View {
         paper.reduce(0) { $0 + secondsBudget(for: $1.module) }
     }
 
+    private var fixedPapers: [[Question]] { MockEngine.fixedPapers(from: QuestionBank.all) }
+
     private var estimatedMinutes: Int {
-        Self.timeLimit(for: MockEngine.assemble(count: mockLength.count, from: QuestionBank.all)) / 60
+        let p = mockLength == .quick
+            ? MockEngine.assemble(count: Self.quickCount, from: QuestionBank.all)
+            : fixedPapers[selectedPaper]
+        return Self.timeLimit(for: p) / 60
     }
 
     /// 听力题首次出现时自动播放一次。
@@ -96,17 +104,23 @@ struct MockExamView: View {
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     Picker("模考长度", selection: $mockLength) {
                         ForEach(MockLength.allCases) { length in
-                            Text(length == .full && !purchase.isUnlocked ? "\(length.label) 🔒" : length.label).tag(length)
+                            Text(length.label).tag(length)
                         }
                     }
                     .pickerStyle(.segmented)
                     Text("本卷按题型节奏配速，约 \(estimatedMinutes) 分钟，到点强制交卷")
                         .font(AppFont.chip).foregroundColor(.secondary)
-                    if mockLength == .full && !purchase.isUnlocked {
-                        Text("完整模考(含考点级薄弱报告)为解锁内容，快速模考永久免费。")
-                            .font(AppFont.chip).foregroundColor(.apexLava)
+                    if mockLength == .full {
+                        Text(purchase.isUnlocked
+                             ? "6 套固定全真模拟卷，合起来覆盖题库全部题目，可反复重考、各自追踪进步。"
+                             : "套卷一永久免费试用；其余 5 套(含考点级薄弱报告)为解锁内容。")
+                            .font(AppFont.chip).foregroundColor(purchase.isUnlocked ? .secondary : .apexLava)
                     }
                 }.cardSurface(padding: Spacing.md)
+
+                if mockLength == .full {
+                    paperPicker
+                }
 
                 let mock = MockManager.shared
                 if mock.count > 0 {
@@ -137,6 +151,57 @@ struct MockExamView: View {
             Text(fmt(v)).font(AppFont.bigStat(22)).foregroundColor(.apexLava)
             Text(label).font(AppFont.caption).foregroundColor(.secondary)
         }.frame(maxWidth: .infinity)
+    }
+
+    /// 6 套全真模拟卷的选择列表：各自独立显示题量/用时与上次/最佳成绩，可反复重考同一套追踪进步。
+    /// 套卷一(freePaperIndex)永久免费试用，其余套卷需解锁完整模考才能选中。
+    private func isPaperLocked(_ i: Int) -> Bool {
+        i != MockEngine.freePaperIndex && !purchase.isUnlocked
+    }
+
+    private var paperPicker: some View {
+        let papers = fixedPapers
+        let manager = MockManager.shared
+        return VStack(spacing: Spacing.sm) {
+            ForEach(0..<papers.count, id: \.self) { i in
+                let s = manager.papers[i]
+                let p = papers[i]
+                let locked = isPaperLocked(i)
+                Button {
+                    if locked { showPaywall = true } else { selectedPaper = i }
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 4) {
+                                Text("套卷\(Self.paperNumerals[i])").font(AppFont.cardTitle)
+                                if i == MockEngine.freePaperIndex {
+                                    TagChip(text: "免费", color: .apexEmerald)
+                                }
+                            }
+                            Text("\(p.count) 题 · 约 \(Self.timeLimit(for: p) / 60) 分钟")
+                                .font(AppFont.caption).foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        if locked {
+                            Image(systemName: "lock.fill").foregroundColor(.secondary)
+                        } else {
+                            if s.count > 0 {
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    Text("上次 \(fmt(s.last))").font(AppFont.chip).foregroundColor(.secondary)
+                                    Text("最佳 \(fmt(s.best))").font(AppFont.chip).foregroundColor(.apexLava)
+                                }
+                            }
+                            Image(systemName: selectedPaper == i ? "largecircle.fill.circle" : "circle")
+                                .foregroundColor(.apexLava)
+                        }
+                    }
+                    .padding(Spacing.md).frame(maxWidth: .infinity)
+                    .background(!locked && selectedPaper == i ? Color.apexLava.opacity(0.12) : Color.apexCardSurface)
+                    .cornerRadius(Radius.inner)
+                    .opacity(locked ? 0.6 : 1)
+                }.buttonStyle(.plain)
+            }
+        }.cardSurface(padding: Spacing.md)
     }
 
     // MARK: Exam
@@ -200,7 +265,8 @@ struct MockExamView: View {
             ScrollView {
                 VStack(spacing: Spacing.lg) {
                     VStack(spacing: 4) {
-                        Text("折合高考分").font(AppFont.caption).foregroundColor(.secondary)
+                        Text(mockLength == .full ? "套卷\(Self.paperNumerals[selectedPaper]) · 折合高考分" : "折合高考分")
+                            .font(AppFont.caption).foregroundColor(.secondary)
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             Text(fmt(r.scaledScore)).font(AppFont.bigStat(52)).foregroundColor(.apexLava)
                             Text("/ \(fmt(r.coveredFullScore))").font(AppFont.body).foregroundColor(.secondary)
@@ -304,11 +370,13 @@ struct MockExamView: View {
     // MARK: 逻辑
 
     private func startExam() {
-        if mockLength == .full && !purchase.isUnlocked {
+        if mockLength == .full && isPaperLocked(selectedPaper) {
             showPaywall = true
             return
         }
-        paper = MockEngine.assemble(count: mockLength.count, from: QuestionBank.all)
+        paper = mockLength == .quick
+            ? MockEngine.assemble(count: Self.quickCount, from: QuestionBank.all)
+            : fixedPapers[selectedPaper]
         answers = [:]; index = 0; elapsed = 0; listeningPlayCount = 0; timedOut = false
         timeLimit = Self.timeLimit(for: paper)
         phase = .exam
@@ -322,7 +390,11 @@ struct MockExamView: View {
             guard let a = answers[q.id] else { continue }
             store.record(q, correct: a == q.answer)
         }
-        MockManager.shared.recordResult(r.scaledScore)
+        if mockLength == .quick {
+            MockManager.shared.recordQuickResult(r.scaledScore)
+        } else {
+            MockManager.shared.recordPaperResult(selectedPaper, r.scaledScore)
+        }
         result = r
         phase = .result
     }
