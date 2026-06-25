@@ -1,7 +1,11 @@
 import SwiftUI
 
 /// 应用文工坊：体裁列表 → 写作要求 + 结构骨架 + 推荐句式 + 高分范文 + 自评清单。
+/// 每个体裁第 1 个场景免费预览，第 2 个场景付费解锁。
 struct AppliedWritingWorkshopView: View {
+    @ObservedObject private var purchase = PurchaseManager.shared
+    @State private var showPaywall = false
+
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.md) {
@@ -9,21 +13,7 @@ struct AppliedWritingWorkshopView: View {
                     .font(AppFont.caption).foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 ForEach(AppliedWritingData.all) { prompt in
-                    NavigationLink { AppliedWritingDetailView(prompt: prompt) } label: {
-                        HStack(spacing: Spacing.md) {
-                            Image(systemName: "envelope.fill").font(.title2).foregroundColor(.apexGold)
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack(spacing: 6) {
-                                    Text(prompt.genre).font(AppFont.cardTitle)
-                                    TagChip(text: prompt.title, color: .apexStarBlue)
-                                }
-                                Text(prompt.scenario).font(AppFont.caption).foregroundColor(.secondary).lineLimit(2)
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
-                        }
-                        .cardSurface(padding: Spacing.md)
-                    }.buttonStyle(.plain)
+                    row(prompt)
                 }
             }
             .padding(Spacing.lg).readableWidth()
@@ -31,13 +21,45 @@ struct AppliedWritingWorkshopView: View {
         .background(Color.apexBackground.ignoresSafeArea())
         .navigationTitle("应用文工坊")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPaywall) { PaywallView() }
+    }
+
+    @ViewBuilder private func row(_ prompt: AppliedWritingPrompt) -> some View {
+        let locked = !prompt.isFree && !purchase.isUnlocked
+        Group {
+            if locked {
+                Button { showPaywall = true } label: { rowLabel(prompt, locked: true) }
+            } else {
+                NavigationLink { AppliedWritingDetailView(prompt: prompt) } label: { rowLabel(prompt, locked: false) }
+            }
+        }.buttonStyle(.plain)
+    }
+
+    private func rowLabel(_ prompt: AppliedWritingPrompt, locked: Bool) -> some View {
+        HStack(spacing: Spacing.md) {
+            Image(systemName: locked ? "lock.fill" : "envelope.fill")
+                .font(.title2).foregroundColor(locked ? .secondary : .apexGold)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text(prompt.genre).font(AppFont.cardTitle)
+                    TagChip(text: prompt.title, color: .apexStarBlue)
+                }
+                Text(prompt.scenario).font(AppFont.caption).foregroundColor(.secondary).lineLimit(2)
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
+        }
+        .cardSurface(padding: Spacing.md)
+        .opacity(locked ? 0.6 : 1)
     }
 }
 
 struct AppliedWritingDetailView: View {
     let prompt: AppliedWritingPrompt
+    @ObservedObject private var purchase = PurchaseManager.shared
     @State private var showEssay = false
     @State private var checked: Set<Int> = []
+    @State private var showPaywall = false
 
     var body: some View {
         ScrollView {
@@ -87,13 +109,32 @@ struct AppliedWritingDetailView: View {
                         .foregroundColor(checked.count == prompt.rubric.count ? .apexEmerald : .secondary)
                 }.cardSurface()
 
-                WritingCoachView()
+                if purchase.isUnlocked {
+                    WritingCoachView()
+                } else {
+                    writingCoachTeaser
+                }
             }
             .padding(Spacing.lg).readableWidth()
         }
         .background(Color.apexBackground.ignoresSafeArea())
         .navigationTitle(prompt.title)
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showPaywall) { PaywallView() }
+    }
+
+    private var writingCoachTeaser: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            SectionHeader(title: "写作教练 · 规则版", systemImage: "wand.and.stars", accent: .apexStarBlue)
+            Text("解锁完整版即可用本地规则引擎为你自己的草稿挑语病、查套路——不联网、不是官方判分。")
+                .font(AppFont.caption).foregroundColor(.secondary)
+            Button { showPaywall = true } label: {
+                Label("解锁写作教练", systemImage: "lock.open.fill").font(AppFont.cardTitle).foregroundColor(.white)
+                    .frame(maxWidth: .infinity).padding(Spacing.md)
+                    .background(Color.apexStarBlue).cornerRadius(Radius.inner)
+            }
+        }
+        .cardSurface()
     }
 
     private func stageRow(index: Int, stage: WritingStage) -> some View {

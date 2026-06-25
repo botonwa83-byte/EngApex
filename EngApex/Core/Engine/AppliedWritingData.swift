@@ -42,7 +42,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 建议信
@@ -69,7 +70,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 感谢信
@@ -96,7 +98,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 道歉信
@@ -123,7 +126,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 通知
@@ -149,7 +153,8 @@ enum AppliedWritingData {
 
         The Students' Union
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 海报
@@ -173,7 +178,8 @@ enum AppliedWritingData {
 
         Simply scan the QR code below or contact Li Hua in Class Three to sign up. Don't miss this chance to make new friends and have fun while learning!
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     // MARK: 求助信·考前复习求助
@@ -200,7 +206,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     // MARK: 建议信·改善校园午餐
@@ -227,7 +234,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     // MARK: 感谢信·感谢老师课后辅导
@@ -254,7 +262,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     // MARK: 道歉信·借书未还致歉
@@ -281,7 +290,8 @@ enum AppliedWritingData {
         Yours,
         Li Hua
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     // MARK: 通知·社团招新通知
@@ -307,7 +317,8 @@ enum AppliedWritingData {
 
         Photography Club
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     // MARK: 海报·校园跳蚤市场海报
@@ -331,7 +342,8 @@ enum AppliedWritingData {
 
         Simply contact the Students' Union before Thursday to reserve your stall. Come and discover some hidden treasures!
         """,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     static func find(_ id: String) -> AppliedWritingPrompt? { all.first { $0.id == id } }

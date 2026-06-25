@@ -279,6 +279,8 @@ final class ScoreEngineTests: XCTestCase {
         let all = ContinuationData.all
         XCTAssertEqual(all.count, 12, "求助/坚持/和解/动物/诚信/亲情六类主题各 2 个场景，加深迁移性")
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "情境 ID 必须唯一")
+        XCTAssertEqual(all.filter(\.isFree).count, 6, "每个主题第 1 个场景应免费预览")
+        XCTAssertEqual(all.filter { !$0.isFree }.count, 6, "每个主题第 2 个场景应付费解锁")
         for p in all {
             XCTAssertFalse(p.stages.isEmpty, "\(p.id) 缺情节链")
             XCTAssertFalse(p.rubric.isEmpty, "\(p.id) 缺自评清单")
@@ -296,6 +298,8 @@ final class ScoreEngineTests: XCTestCase {
         let all = AppliedWritingData.all
         XCTAssertEqual(all.count, 12, "六个体裁各 2 个场景，加深迁移性")
         XCTAssertEqual(Set(all.map(\.id)).count, all.count, "情境 ID 必须唯一")
+        XCTAssertEqual(all.filter(\.isFree).count, 6, "每个体裁第 1 个场景应免费预览")
+        XCTAssertEqual(all.filter { !$0.isFree }.count, 6, "每个体裁第 2 个场景应付费解锁")
         for p in all {
             XCTAssertFalse(p.stages.isEmpty, "\(p.id) 缺结构骨架")
             XCTAssertFalse(p.rubric.isEmpty, "\(p.id) 缺自评清单")
@@ -424,6 +428,27 @@ final class ScoreEngineTests: XCTestCase {
         XCTAssertEqual(r.totalCorrect, 0)
         XCTAssertEqual(r.scaledScore, 0, accuracy: 0.01)
         XCTAssertNotNil(r.weakestModule)
+    }
+
+    func testMockScoreTracksWeakestPointTags() {
+        let paper = MockEngine.assemble(count: 50, from: QuestionBank.all)
+        // 全错，制造每个考点 0% 正确率
+        let answers = Dictionary(uniqueKeysWithValues: paper.map { ($0.id, ($0.answer + 1) % $0.options.count) })
+        let r = MockEngine.score(questions: paper, answers: answers)
+        let weakest = r.weakestPointTags
+        XCTAssertFalse(weakest.isEmpty, "50 题全错应能产出考点级薄弱报告")
+        for item in weakest {
+            XCTAssertGreaterThanOrEqual(item.total, 2, "样本量过小(<2)的考点不应进入报告，避免单题误差被当成薄弱点")
+            XCTAssertEqual(item.accuracy, 0, accuracy: 0.01)
+        }
+        XCTAssertTrue(zip(weakest, weakest.dropFirst()).allSatisfy { $0.0.accuracy <= $0.1.accuracy }, "应按正确率升序排列")
+    }
+
+    func testMockScoreOmitsPerfectPointTagsFromWeakestList() {
+        let paper = MockEngine.assemble(count: 50, from: QuestionBank.all)
+        let answers = Dictionary(uniqueKeysWithValues: paper.map { ($0.id, $0.answer) })  // 全对
+        let r = MockEngine.score(questions: paper, answers: answers)
+        XCTAssertTrue(r.weakestPointTags.isEmpty, "全部正确时不应有薄弱考点")
     }
 
     func testRecentErrorRate() {

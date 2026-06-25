@@ -58,7 +58,7 @@ struct MainTabView: View {
                 .tabItem { Label("题型靶场", systemImage: "target") }
                 .tag(1)
             AtlasView()
-                .tabItem { Label("考点图谱", systemImage: "map") }
+                .tabItem { Label("素材库", systemImage: "books.vertical") }
                 .tag(2)
             MoreView()
                 .tabItem { Label("更多", systemImage: "ellipsis.circle") }

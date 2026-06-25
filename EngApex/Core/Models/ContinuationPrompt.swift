@@ -11,6 +11,7 @@ struct ContinuationPrompt: Identifiable {
     let stages: [PlotStage]    // 情节链脚手架
     let modelEssay: String     // 高分范文
     let rubric: [String]       // 自评要点
+    let isFree: Bool           // 每个主题的第 1 个场景免费预览，第 2 个场景付费解锁
 }
 
 /// 情节链的一个阶段。

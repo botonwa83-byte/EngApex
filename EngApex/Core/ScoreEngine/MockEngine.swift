@@ -3,6 +3,8 @@ import Foundation
 /// 一次模考的判分结果。
 struct MockResult {
     let perModule: [ExamModule: (correct: Int, total: Int)]
+    /// 按考点标签(Question.pointTag)细分的正确率——大卷(完整模考)样本量足够时才有统计意义，是付费完整模考的差异化报告。
+    let perPointTag: [String: (correct: Int, total: Int)]
     let answeredCount: Int
     let totalCount: Int
 
@@ -39,6 +41,16 @@ struct MockResult {
             if acc < worst { worst = acc; weakest = m }
         }
         return weakest
+    }
+
+    /// 答错≥1 次、且作答样本数≥2(避免单题误差被当成"薄弱点")的考点，按正确率升序——完整模考专属的考点级薄弱报告。
+    var weakestPointTags: [(tag: String, accuracy: Double, total: Int)] {
+        perPointTag.compactMap { tag, r in
+            guard r.total >= 2 else { return nil }
+            return (tag, Double(r.correct) / Double(r.total), r.total)
+        }
+        .filter { $0.accuracy < 1.0 }
+        .sorted { $0.accuracy < $1.accuracy }
     }
 }
 
@@ -103,17 +115,21 @@ enum MockEngine {
     /// 判分：answers 为 questionId → 所选下标（未作答的题不计入 correct，但计入 total）。
     static func score(questions: [Question], answers: [String: Int]) -> MockResult {
         var per: [ExamModule: (correct: Int, total: Int)] = [:]
+        var perTag: [String: (correct: Int, total: Int)] = [:]
         var answered = 0
         for q in questions {
             var entry = per[q.module] ?? (0, 0)
+            var tagEntry = perTag[q.pointTag] ?? (0, 0)
             entry.total += 1
+            tagEntry.total += 1
             if let a = answers[q.id] {
                 answered += 1
-                if a == q.answer { entry.correct += 1 }
+                if a == q.answer { entry.correct += 1; tagEntry.correct += 1 }
             }
             per[q.module] = entry
+            perTag[q.pointTag] = tagEntry
         }
-        return MockResult(perModule: per, answeredCount: answered, totalCount: questions.count)
+        return MockResult(perModule: per, perPointTag: perTag, answeredCount: answered, totalCount: questions.count)
     }
 }
 

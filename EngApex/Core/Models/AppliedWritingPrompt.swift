@@ -10,6 +10,7 @@ struct AppliedWritingPrompt: Identifiable {
     let stages: [WritingStage] // 结构骨架
     let modelEssay: String     // 高分范文
     let rubric: [String]       // 自评要点
+    let isFree: Bool           // 每个体裁的第 1 个场景免费预览，第 2 个场景付费解锁
 }
 
 /// 应用文骨架的一个段落（开头/正文/结尾，或通知类的标题/要点/结尾）。

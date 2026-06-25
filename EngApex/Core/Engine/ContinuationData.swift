@@ -33,7 +33,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由获救升华到对善意与成长的领悟，点题收束。", phraseIds: ["p20"]),
         ],
         modelEssay: rainEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let rainEssay: String = {
@@ -63,7 +64,8 @@ enum ContinuationData {
             PlotStage(name: "升华·意义", guidance: "由‘最后一名却像赢家’升华坚持的意义。", phraseIds: ["p20"]),
         ],
         modelEssay: sportsEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let sportsEssay: String = {
@@ -93,7 +95,8 @@ enum ContinuationData {
             PlotStage(name: "升华·友情感悟", guidance: "由这次误会升华到'真正的朋友愿意主动沟通'的感悟，点题收束。", phraseIds: ["p8"]),
         ],
         modelEssay: reconciliationEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let reconciliationEssay: String = {
@@ -123,7 +126,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由这次经历升华到'善意微小却能改变一切'的感悟。", phraseIds: ["p7"]),
         ],
         modelEssay: strayDogEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let strayDogEssay: String = {
@@ -153,7 +157,8 @@ enum ContinuationData {
             PlotStage(name: "升华·诚信感悟", guidance: "由这次选择升华到'诚实比一时的诱惑更珍贵'的感悟。", phraseIds: ["p19"]),
         ],
         modelEssay: lostWalletEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let lostWalletEssay: String = {
@@ -183,7 +188,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由旧自行车升华到'爱有时藏在不起眼的细节里'的感悟，点题收束。", phraseIds: ["p8"]),
         ],
         modelEssay: oldBicycleEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: true
     )
 
     private static let oldBicycleEssay: String = {
@@ -213,7 +219,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由这次经历升华到'善意不分语言'的感悟。", phraseIds: ["p7"]),
         ],
         modelEssay: lostTouristEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let lostTouristEssay: String = {
@@ -244,7 +251,8 @@ enum ContinuationData {
             PlotStage(name: "升华·意义", guidance: "由'带伤完成演奏'升华坚持的意义。", phraseIds: ["p7"]),
         ],
         modelEssay: pianoContestEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let pianoContestEssay: String = {
@@ -274,7 +282,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由这次误会升华到'先核实再指责'的感悟。", phraseIds: ["p8"]),
         ],
         modelEssay: siblingEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let siblingEssay: String = {
@@ -304,7 +313,8 @@ enum ContinuationData {
             PlotStage(name: "升华·感悟", guidance: "由这次经历升华到'耐心与陪伴的意义'。", phraseIds: ["p7"]),
         ],
         modelEssay: birdEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let birdEssay: String = {
@@ -334,7 +344,8 @@ enum ContinuationData {
             PlotStage(name: "升华·诚信感悟", guidance: "由这次选择升华到'诚实本身就是一种胜利'。", phraseIds: ["p19"]),
         ],
         modelEssay: examEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let examEssay: String = {
@@ -365,7 +376,8 @@ enum ContinuationData {
             PlotStage(name: "升华·亲情感悟", guidance: "由这封信升华到'爱常常藏在沉默背后'的感悟。", phraseIds: ["p8"]),
         ],
         modelEssay: letterEssay,
-        rubric: sharedRubric
+        rubric: sharedRubric,
+        isFree: false
     )
 
     private static let letterEssay: String = {

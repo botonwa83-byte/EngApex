@@ -6,11 +6,13 @@ struct DashboardView: View {
     @EnvironmentObject var store: EngStore
     @EnvironmentObject var purchase: PurchaseManager
     @ObservedObject private var daily = DailyManager.shared
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.xl) {
+                    unlockBanner
                     planCard
                     estimatorCard
                     sniperCard
@@ -23,6 +25,27 @@ struct DashboardView: View {
             }
             .background(Color.apexBackground.ignoresSafeArea())
             .navigationTitle("提分驾驶舱")
+        }
+        .sheet(isPresented: $showPaywall) { PaywallView() }
+    }
+
+    // MARK: 解锁完整版（首页与"更多"页同一文案，保持一致）
+
+    @ViewBuilder private var unlockBanner: some View {
+        if !purchase.isUnlocked {
+            Button { showPaywall = true } label: {
+                HStack(spacing: Spacing.md) {
+                    Image(systemName: "crown.fill").font(.title3).foregroundColor(.apexGold)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("解锁完整版").font(AppFont.cardTitle)
+                        Text("主线 7 关全开（阅读/应用文/读后续写/听力），一次买断")
+                            .font(AppFont.caption).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
+                }
+                .cardSurface(padding: Spacing.md)
+            }.buttonStyle(.plain)
         }
     }
 

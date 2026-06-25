@@ -68,9 +68,6 @@ struct MoreView: View {
                     NavigationLink { AppliedWritingWorkshopView() } label: {
                         Label("应用文工坊", systemImage: "envelope.fill")
                     }
-                    NavigationLink { VocabView() } label: {
-                        Label("词汇专项", systemImage: "character.book.closed")
-                    }
                 }
 
                 Section("设置") {

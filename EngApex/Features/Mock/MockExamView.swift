@@ -3,7 +3,9 @@ import SwiftUI
 /// 限时模考：算法组卷 → 限时作答（不即时揭答案）→ 自动判分折合高考分 + 薄弱报告。
 struct MockExamView: View {
     @EnvironmentObject var store: EngStore
+    @ObservedObject private var purchase = PurchaseManager.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showPaywall = false
 
     private enum Phase { case intro, exam, result }
     @State private var phase: Phase = .intro
@@ -47,6 +49,7 @@ struct MockExamView: View {
             if remaining <= 0 { timedOut = true; submit() }
         }
         .onChange(of: index) { _ in listeningPlayCount = 0; autoPlayIfNeeded() }
+        .sheet(isPresented: $showPaywall) { PaywallView() }
     }
 
     /// 按模块给每题分配一个接近真实考场节奏的时间预算（含听音频/审题时间）。
@@ -92,11 +95,17 @@ struct MockExamView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.sm) {
                     Picker("模考长度", selection: $mockLength) {
-                        ForEach(MockLength.allCases) { Text($0.label).tag($0) }
+                        ForEach(MockLength.allCases) { length in
+                            Text(length == .full && !purchase.isUnlocked ? "\(length.label) 🔒" : length.label).tag(length)
+                        }
                     }
                     .pickerStyle(.segmented)
                     Text("本卷按题型节奏配速，约 \(estimatedMinutes) 分钟，到点强制交卷")
                         .font(AppFont.chip).foregroundColor(.secondary)
+                    if mockLength == .full && !purchase.isUnlocked {
+                        Text("完整模考(含考点级薄弱报告)为解锁内容，快速模考永久免费。")
+                            .font(AppFont.chip).foregroundColor(.apexLava)
+                    }
                 }.cardSurface(padding: Spacing.md)
 
                 let mock = MockManager.shared
@@ -233,6 +242,12 @@ struct MockExamView: View {
                         }.cardSurface(padding: Spacing.md)
                     }
 
+                    if purchase.isUnlocked {
+                        pointTagReport(r)
+                    } else {
+                        pointTagTeaser
+                    }
+
                     Text("错题已自动收录，可在错题本与智能复习里再战。")
                         .font(AppFont.caption).foregroundColor(.secondary)
 
@@ -247,9 +262,52 @@ struct MockExamView: View {
         }
     }
 
+    @ViewBuilder private func pointTagReport(_ r: MockResult) -> some View {
+        let weakest = Array(r.weakestPointTags.prefix(5))
+        if !weakest.isEmpty {
+            VStack(alignment: .leading, spacing: Spacing.md) {
+                SectionHeader(title: "考点级薄弱报告", systemImage: "magnifyingglass", accent: .apexMystery)
+                Text("不只是哪个模块弱，精确到具体考点——完整模考的样本量足够支撑这份细颗粒度报告。")
+                    .font(AppFont.caption).foregroundColor(.secondary)
+                ForEach(weakest, id: \.tag) { item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(item.tag).font(AppFont.body)
+                            Spacer()
+                            Text("\(Int(item.accuracy * 100))% (\(item.total) 题)").font(AppFont.caption).foregroundColor(.secondary)
+                        }
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(Color.secondary.opacity(0.15))
+                                Capsule().fill(Color.apexDanger).frame(width: geo.size.width * item.accuracy)
+                            }
+                        }.frame(height: 6)
+                    }
+                }
+            }.cardSurface()
+        }
+    }
+
+    private var pointTagTeaser: some View {
+        VStack(alignment: .leading, spacing: Spacing.sm) {
+            SectionHeader(title: "考点级薄弱报告", systemImage: "magnifyingglass", accent: .apexMystery)
+            Text("解锁完整版可看到精确到具体考点(而非只是模块)的薄弱排行——知道具体差在哪一个语法点/阅读技巧上。")
+                .font(AppFont.caption).foregroundColor(.secondary)
+            Button { showPaywall = true } label: {
+                Label("解锁完整模考报告", systemImage: "lock.open.fill").font(AppFont.cardTitle).foregroundColor(.white)
+                    .frame(maxWidth: .infinity).padding(Spacing.md)
+                    .background(Color.apexStarBlue).cornerRadius(Radius.inner)
+            }
+        }.cardSurface()
+    }
+
     // MARK: 逻辑
 
     private func startExam() {
+        if mockLength == .full && !purchase.isUnlocked {
+            showPaywall = true
+            return
+        }
         paper = MockEngine.assemble(count: mockLength.count, from: QuestionBank.all)
         answers = [:]; index = 0; elapsed = 0; listeningPlayCount = 0; timedOut = false
         timeLimit = Self.timeLimit(for: paper)
